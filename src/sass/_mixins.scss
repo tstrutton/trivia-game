@@ -1,0 +1,41 @@
+@mixin iphone6 {
+  @media only screen and (min-width: 25.875em) {
+    @content;
+  }
+}
+@mixin medium-up {
+  @media only screen and (min-width: 48em) {
+    @content;
+  }
+}
+@mixin med-large-up {
+  @media only screen and (min-width: 60em) {
+    @content;
+  }
+}
+@mixin large-up {
+  @media only screen and (min-width: 62em) {
+    @content;
+  }
+}
+@mixin xl-up {
+  @media only screen and (min-width: 75em) {
+    @content;
+  }
+}
+//FUNCTIONS
+$base-font: 16;
+// em calculator
+
+@function em($pixelNumber){
+  @return #{$pixelNumber/$base-font}em;
+}
+
+@function rem($pixelNumber){
+  @return #{$pixelNumber/$base-font}rem;
+}
+
+// letter space corrector
+@function space($letterSpace){
+  @return #{$letterSpace/1000px}em;
+}
