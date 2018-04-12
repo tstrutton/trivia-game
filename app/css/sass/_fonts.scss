@@ -1,0 +1,26 @@
+@font-face {
+  font-family: 'Gotham-Book';
+  src: url('../fonts/Gotham-Book.eot');
+  src: url('../fonts/Gotham-Book.woff2') format('woff2'),
+       url('../fonts/Gotham-Book.woff') format('woff'),
+       url('../fonts/Gotham-Book.ttf') format('truetype'),
+       url('../fonts/Gotham-Book.svg#Gotham-Book') format('svg'),
+       url('../fonts/Gotham-Book.eot?#iefix') format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Gotham-Black';
+  src: url('../fonts/Gotham-Black.eot');
+  src: url('../fonts/Gotham-Black.woff2') format('woff2'),
+       url('../fonts/Gotham-Black.woff') format('woff'),
+       url('../fonts/Gotham-Black.ttf') format('truetype'),
+       url('../fonts/Gotham-Black.svg#Gotham-Black') format('svg'),
+       url('../fonts/Gotham-Black.eot?#iefix') format('embedded-opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+$gothamBlack: 'Gotham-Black';
+$gothamBook: 'Gotham-Book';

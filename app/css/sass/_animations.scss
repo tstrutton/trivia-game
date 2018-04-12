@@ -1,0 +1,15 @@
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .7s ease-out;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+.grow-enter-active, .grow-leave-active {
+  transition: 1s;
+}
+
+.grow-enter, .grow-leave-to {
+  opacity: 0;
+}

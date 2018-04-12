@@ -1,0 +1,80 @@
+#start-screen{
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  display: flex;
+  background: url('../images/background.png');
+  background-size: cover;
+  background-position: center;
+  justify-content: center;
+  align-items: center;
+
+  #name-form{
+  	width: 80%;
+  	margin-bottom: 50px;
+
+  	#name-prompt{
+  		font-size: 2em;
+  		text-align: center;
+  		color: $white;
+  		margin-bottom: 20px;
+
+  	}
+
+  	.form-group{
+  		width: 50%;
+  		display: inline-block;
+  		margin: 0;
+  		font-size: 1em;
+  		text-align: center;
+
+  		label{
+  			font-size: 1.5em;
+  			color: $white;
+  			display: block;
+  			margin-bottom:15px;
+  		}
+  		input{
+  			display: block;
+  			padding: 5px 10px;
+  			margin: 0 auto;
+  			font-size: 1.5em;
+  			background: transparentize($white,0.3);
+  			border: none;
+  		}
+  	}
+  }
+
+  #name-button{
+  	margin: 75px auto 0 auto;
+  	display: block;
+  	background: $green;
+  	color: $white;
+  	border-radius: 10px;
+  	font-size: 1.25em;
+  	padding: 15px 40px;
+  	border: 3px solid $green;
+  	transition: 0.4s;
+
+  	&:hover{
+  		background: none;
+  	}
+  }
+}
+
+.warning-box{
+  opacity: 0;
+  text-align: center;
+  margin: 0px 0 50px 0;
+  
+  h2{
+  	font-size: 1.25em;
+  	font-family: $gothamBook;
+  	color: $white;
+  }
+
+}
+
+.active{
+  opacity: 1;
+}
