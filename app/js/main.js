@@ -1,14 +1,14 @@
-var Readable = require('stream').Readable  
-var util = require('util')  
+var Readable = require('stream').Readable
+var util = require('util')
 var five = require('johnny-five')
 
-util.inherits(MyStream, Readable)  
-function MyStream(opt) {  
+util.inherits(MyStream, Readable)
+function MyStream(opt) {
   Readable.call(this, opt)
 }
-MyStream.prototype._read = function() {};  
+MyStream.prototype._read = function() {};
 // hook in our stream
-process.__defineGetter__('stdin', function() {  
+process.__defineGetter__('stdin', function() {
   if (process.__stdin) return process.__stdin
   process.__stdin = new MyStream()
   return process.__stdin
@@ -21,6 +21,24 @@ board.on("ready", function() {
   led.blink(500);
 });
 
+const TeaserScreen = {
+  name: 'TeaserScreen',
+  data() {
+    return{
+
+    }
+  },
+  methods: {
+    closeTeaser(){
+      this.$router.push('start');
+    }
+  },
+  template: `
+  <div id="teaser-screen" @click="closeTeaser">
+    <h2>TEASER</h2>
+  </div>`
+}
+
 const StartScreen = {
   name: 'StartScreen',
   data() {
@@ -29,7 +47,6 @@ const StartScreen = {
       playertwo: '',
       warningActive: false,
       timeElapsed: 0,
-
     }
   },
   methods: {
@@ -38,12 +55,12 @@ const StartScreen = {
         this.warningActive = true;
       }else{
         this.$parent.$emit('DefinePlayers', playerone, playertwo);
-        this.$router.push('quiz')
-        this.gameTimer();
+        this.$router.push('tutorial');
+        // this.gameTimer();
       }
     },
-    gameTimer(){      
-      console.log("GAME TIMER STARTED");
+    gameTimer(){
+      //console.log("GAME TIMER STARTED");
       gameTime = window.setInterval(this.gameClock, 1000);
     },
     gameClock(){
@@ -65,14 +82,30 @@ const StartScreen = {
       <label>Player 2:</label>
       <input type="text" name="playertwo" v-model="playertwo">
     </div>
-    
+
     <button class="button" id="name-button" @click="startGame(playerone,playertwo)">Start</button>
     </div>
   </div>`
-}  
+}
+
+const Tutorial = {
+  name: 'Tutorial',
+  mounted(){
+    var teaserVideo = this.$el.querySelector('#teaserVideo');
+    teaserVideo.onended = function() {
+        router.push('quiz');
+    };
+  },
+  template: `
+  <div id="tutorial-screen">
+    <div id="video-container">
+      <video id="teaserVideo" src="videos/correct2.mp4" autoplay></video>
+    </div>
+  </div>`
+}
 
 const PlayScreen = {
-  props: ['playerone', 'playertwo', 'answered', 'playeronepoints','playertwopoints'],  
+  props: ['playerone', 'playertwo', 'answered', 'playeronepoints','playertwopoints'],
   name: 'PlayScreen',
   data(){
     return{
@@ -84,8 +117,11 @@ const PlayScreen = {
       showVideo: false,
       correct: false,
       incorrect: false,
+      timesUp: false,
       showAnswers: false,
       showQuestion: false,
+      showTimer: false,
+      playerAnswered: '',
       play: false
     }
   },
@@ -96,10 +132,10 @@ const PlayScreen = {
         //console.log(res.data);
         vm.questions = res.data
         this.$parent.$emit('LoadQuestions', vm.questions);
-        
+
         var limit = vm.questions.length;
         var currentId = Math.floor(Math.random()*limit);
-        console.log(currentId);
+        //console.log(currentId);
         vm.currentQuestion = vm.questions[currentId];
         vm.currentId = currentId;
       })
@@ -109,6 +145,7 @@ const PlayScreen = {
     loadQuestions(){
       setTimeout(() => this.showQuestion = true, 1000);
       setTimeout(() => this.showAnswers = true, 4000);
+      setTimeout(() => this.showTimer = true, 4600);
       setTimeout(() => this.startTimer(), 4500);
     },
     switchQuestion(currentId){
@@ -118,11 +155,10 @@ const PlayScreen = {
       currentId = Math.floor(Math.random()*limit);
       vm.currentQuestion = vm.questions[currentId];
       vm.currentId = currentId;
-
-      this.startTimer();
+      this.loadQuestions();
     },
     questionGuess: function(e,player){
-      var vm = this;      
+      var vm = this;
       var correctAnswer = vm.currentQuestion.answer;
       var led = new five.Led(13);
 
@@ -130,6 +166,9 @@ const PlayScreen = {
       if (this.play == true) {
         if(e === correctAnswer) {
           this.correctFunction(player);
+          this.showQuestion = false;
+          this.showAnswers = false;
+          this.showTimer = false;
         }else{
           this.incorrectFunction(player);
         }
@@ -152,7 +191,7 @@ const PlayScreen = {
       var led = new five.Led(13);
       this.stopTimer();
 
-      console.log("YEAHHH GOOD JOB");
+      //console.log("NO BAD JOB");
       led.blink(10);
       this.playVideo("incorrect");
     },
@@ -163,11 +202,10 @@ const PlayScreen = {
     playVideo(answer){
       var vm = this;
       this.showVideo = true;
-      console.log(this.showVideo);
 
       if (answer === "correct") {
         this.correct = true;
-       
+
         var correctVideo = this.$el.querySelector('#correctVideo');
         correctVideo.play();
         correctVideo.onended = function() {
@@ -178,12 +216,29 @@ const PlayScreen = {
 
       }else if (answer === "incorrect") {
         this.incorrect = true;
-       
+
         var incorrectVideo = this.$el.querySelector('#incorrectVideo');
         incorrectVideo.play();
         incorrectVideo.onended = function() {
             vm.showVideo = false;
             vm.incorrect = false;
+            vm.playerAnswered = "playerOne";
+            vm.resumeTimer();
+            //vm.switchQuestion();
+        };
+
+      }else if(answer === "time"){
+        console.log("TIME UP FUNCTION")
+        this.timesUp = true;
+
+        var timesUpVideo = this.$el.querySelector('#timesUpVideo');
+        timesUpVideo.play();
+        this.showQuestion = false;
+        this.showAnswers = false;
+        this.showTimer = false;
+        timesUpVideo.onended = function() {
+            vm.showVideo = false;
+            vm.timesUp = false;
             vm.switchQuestion();
         };
       }
@@ -192,7 +247,7 @@ const PlayScreen = {
       //true = questions can be submitted
       this.play = true;
       this.timerLength = 60;
-      
+
       console.log("TIMER STARTED");
       //Use timer seconds for the visual aspect of timer
       this.timerSeconds = this.timerLength;
@@ -200,11 +255,15 @@ const PlayScreen = {
       //Set timer to count down every second
       timerObj = window.setInterval(this.timerTick, 1000);
     },
+    resumeTimer(){
+      this.play = true;
+      timerObj = window.setInterval(this.timerTick, 1000);
+    },
     stopTimer(){
       //false = questions can not be submitted
       this.play = false;
-      
-      console.log("TIMER STOPPED");
+
+      //console.log("TIMER STOPPED");
       window.clearInterval(timerObj);
       timerObj = null;
     },
@@ -216,8 +275,10 @@ const PlayScreen = {
           this.timerBarWidth();
           this.timerSeconds = this.timerLength;
           this.timerFormat();
-      } else {
+      }else{
+          console.log("TIMES UP");
           this.stopTimer();
+          this.playVideo("time");
           // Some broadcast stuff to disable answering
       }
     },
@@ -243,6 +304,9 @@ const PlayScreen = {
           <transition name="fade">
             <video id="incorrectVideo" src="videos/wrong.mp4" v-show="incorrect"></video>
           </transition>
+          <transition name="fade">
+            <video id="timesUpVideo" src="videos/wrong.mp4" v-show="timesUp"></video>
+          </transition>
       </div>
     </transition>
 
@@ -258,11 +322,13 @@ const PlayScreen = {
       <h2>{{playertwo}}</h2>
       <div class="point-container">
         <div class="point" v-for="points in playertwopoints"><img src="images/coin_yellow.svg" alt="point icon"></div>
-      </div> 
+      </div>
     </div>
 
     <div id="clock">
-      <h2>{{timerSeconds}}</h2>
+      <transition name="fade">
+        <h2 v-show="showTimer">{{timerSeconds}}</h2>
+      </transition>
     </div>
 
     <!-- Questions Start -->
@@ -272,7 +338,7 @@ const PlayScreen = {
           <h2>{{currentQuestion.question}}</h2>
         </div>
       </transition>
-      
+
       <transition-group name="grow">
         <div :id="'answer-'+answer.id" class="answer-container"  v-show="showAnswers" v-for="answer in currentQuestion.answers" :key="answer.id">
           <h3>{{answer.id}}</h3>
@@ -298,16 +364,26 @@ const PlayScreen = {
       <button id="2b" @click="questionGuess('b','2')">B</button>
       <button id="2c" @click="questionGuess('c','2')">C</button>
       <button id="2d" @click="questionGuess('d','2')">D</button>
-    </div>  
+    </div>
 
   </div>`
-}  
+}
 
 const routes = [
-    { 
+    {
       path: '/',
+      name: 'TeaserScreen',
+      component: TeaserScreen
+    },
+    {
+      path: '/start',
       name: 'StartScreen',
       component: StartScreen
+    },
+    {
+      path: '/tutorial',
+      name: 'Tutorial',
+      component: Tutorial
     },
     {
       path: '/quiz',
@@ -356,7 +432,7 @@ new Vue({
       //set questions to be all questions
       this.questions = questions;
     });
-    
+
   },
 })
 
@@ -396,7 +472,7 @@ new Vue({
 //       //set questions to be all questions
 //       this.questions = questions;
 //     });
-    
+
 //   }
 // })
 
@@ -414,7 +490,7 @@ new Vue({
       <div id="question">
         <h2>{{currentQuestion.question}}</h2>
       </div>
-      
+
       <div :id="'answer-'+answer.id" class="answer-container" v-for="answer in currentQuestion.answers" :key="answer.id">
         <h3>{{answer.id}}</h3>
         <h4>{{answer.answer}}</h4>
@@ -422,8 +498,3 @@ new Vue({
     </div>
   `
 })*/
-
-
-
-
- 
