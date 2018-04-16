@@ -100,7 +100,7 @@ const Tutorial = {
   template: `
   <div id="tutorial-screen">
     <div id="video-container">
-      <video id="teaserVideo" src="videos/correct.mp4" autoplay></video>
+      <video id="teaserVideo" src="videos/rules.mp4" autoplay></video>
     </div>
   </div>`
 }
@@ -124,7 +124,7 @@ const PlayScreen = {
       showQuestion: false,
       showTimer: false,
       guessed: [],
-      play: false
+      play: false,
     }
   },
   created(){
@@ -207,6 +207,8 @@ const PlayScreen = {
       console.log(points);
 
       if (points === 4) {
+        this.$parent.$emit('Winner', player);
+        clearInterval(gameTime);
         this.playVideo("winner");
       }else{
         this.playVideo("correct");
@@ -290,7 +292,6 @@ const PlayScreen = {
         };
       }else if(answer === "winner"){
         this.winner = true;
-        clearInterval(gameTime);
 
         var winnerVideo = this.$el.querySelector('#winnerVideo');
         winnerVideo.play();
@@ -300,6 +301,7 @@ const PlayScreen = {
         winnerVideo.onended = function() {
             vm.showVideo = false;
             vm.timesUp = false;
+            vm.$emit.winner
             vm.$router.push('gameOver');
         };
       }
@@ -429,28 +431,43 @@ const PlayScreen = {
       <button id="2c" @click="questionGuess('c','2')">C</button>
       <button id="2d" @click="questionGuess('d','2')">D</button>
     </div>
-
   </div>`
 }
 
 const GameOver = {
-  props: ['playerone', 'playertwo', 'answered', 'playeronepoints','playertwopoints','gametime'],
+  props: ['playerone','playertwo','gametime','winner'],
   name: 'GameOver',
   data(){
     return{
-
+      winnerName: ''
     }
   },
-
   methods: {
+    saveScore(){
+      console.log(this.winnerName);
+      console.log(this.gametime);
+      this.$router.push('/');
 
+
+    }
+
+  },
+  created(){
+    console.log(this.winner);
+    var winner = this.winner;
+    if (winner=== "1") {
+      this.winnerName = this.playerone;
+    }else if(winner === "2"){
+      this.winnerName = this.playertwo;
+    }
   },
 
   template: `
   <div id="game-over">
     <h2>Game Over</h2>
-    <h3>{{gametime}}</h3>
-
+    <h4>{{winnerName}}</h4>
+    <h3>Your winning time: {{gametime}} seconds</h3>
+    <button @click="saveScore">Submit Your Score!</button>
   </div>`
 }
 
@@ -495,10 +512,10 @@ new Vue({
       playerone: '',
       playertwo: '',
       questions: [],
-      playeronepoints: 3,
+      playeronepoints: 0,
       playertwopoints: 0,
-      gametime: 40,
-      winner: ''
+      gametime: 0,
+      winner: 0
     }
   },
   created() {
@@ -512,7 +529,6 @@ new Vue({
     });
     this.$on('Winner',  winner => {
       this.winner = winner;
-      console.log(this.gameTime);
     });
     this.$on('RemoveQuestion', (id) => {
       //console.log(this.questions);
@@ -536,66 +552,3 @@ new Vue({
 
   },
 })
-
-// const rootApp = new Vue({
-//   el: '#app',
-//   router: router,
-//   data (){
-//     return{
-//       playerOne: '',
-//       playerTwo: '',
-//       questions: [],
-//       playerOnePoints: 0,
-//       playerTwoPoints: 0,
-//     }
-//   },
-//   created() {
-//     this.$on('DefinePlayers',  (playerOne, playerTwo) => {
-//       this.playerOne = playerOne;
-//       this.playerTwo = playerTwo;
-//     });
-//     this.$on('RemoveQuestion', (id) => {
-//       //console.log(this.questions);
-//       //Remove the current questions
-//       this.questions.splice(id,1);
-//       //console.log(this.questions);
-//     });
-//     this.$on('Correct', (player) => {
-//       console.log("REACHED");
-//       //console.log(player);
-//       if(player == 1) {
-//         this.playerOnePoints ++;
-//       }else if(player == 2){
-//         this.playerTwoPoints ++;
-//       }
-//     });
-//     this.$on('LoadQuestions', (questions) => {
-//       //set questions to be all questions
-//       this.questions = questions;
-//     });
-
-//   }
-// })
-
-
-/*Vue.component('quiz-questions', {
-  props: ['currentQuestion'],
-  name: 'QuizQuestions',
-  data(){
-    return {
-      correctAnswer: this.currentQuestion.answer,
-    }
-  },
-  template: `
-    <div id="question-container">
-      <div id="question">
-        <h2>{{currentQuestion.question}}</h2>
-      </div>
-
-      <div :id="'answer-'+answer.id" class="answer-container" v-for="answer in currentQuestion.answers" :key="answer.id">
-        <h3>{{answer.id}}</h3>
-        <h4>{{answer.answer}}</h4>
-      </div>
-    </div>
-  `
-})*/
