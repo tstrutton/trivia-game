@@ -56,7 +56,7 @@ const StartScreen = {
       }else{
         this.$parent.$emit('DefinePlayers', playerone, playertwo);
         this.$router.push('tutorial');
-        // this.gameTimer();
+        this.gameTimer();
       }
     },
     gameTimer(){
@@ -65,7 +65,8 @@ const StartScreen = {
     },
     gameClock(){
       this.timeElapsed ++;
-      console.log(this.timeElapsed);
+      this.$parent.$emit('GameTime', this.timeElapsed);
+      //console.log(this.timeElapsed);
     }
   },
   template: `
@@ -99,7 +100,7 @@ const Tutorial = {
   template: `
   <div id="tutorial-screen">
     <div id="video-container">
-      <video id="teaserVideo" src="videos/correct2.mp4" autoplay></video>
+      <video id="teaserVideo" src="videos/correct.mp4" autoplay></video>
     </div>
   </div>`
 }
@@ -118,10 +119,11 @@ const PlayScreen = {
       correct: false,
       incorrect: false,
       timesUp: false,
+      winner: false,
       showAnswers: false,
       showQuestion: false,
       showTimer: false,
-      playerAnswered: '',
+      guessed: [],
       play: false
     }
   },
@@ -161,41 +163,75 @@ const PlayScreen = {
       var vm = this;
       var correctAnswer = vm.currentQuestion.answer;
       var led = new five.Led(13);
+      var check = this.guessed.indexOf(player);
 
-      //Only allow questions to be answered when play is true
-      if (this.play == true) {
-        if(e === correctAnswer) {
-          this.correctFunction(player);
-          this.showQuestion = false;
-          this.showAnswers = false;
-          this.showTimer = false;
-        }else{
-          this.incorrectFunction(player);
-        }
+      //Only allow players to guess once
+      if (check != -1) {
+        console.log("Already answered");
       }else{
-        console.log("Cant answer right now.");
+        //Only allow questions to be answered when play is true
+        if (this.play == true) {
+          this.guessed.push(player);
+
+          if(e === correctAnswer) {
+            this.correctFunction(player);
+            this.showQuestion = false;
+            this.showAnswers = false;
+            this.showTimer = false;
+          }else{
+            this.incorrectFunction(player);
+          }
+        }else{
+          console.log("Cant answer right now.");
+        }
+
       }
+
     },
     correctFunction(player){
+      this.guessed = [];
       var vm = this;
       var led = new five.Led(13);
       this.stopTimer();
+      var points;
 
-      console.log("YEAHHH GOOD JOB");
+      if (player === "1") {
+        points = this.playeronepoints;
+      }else if(player === "2"){
+        points = this.playertwopoints;
+      }
+
       led.blink(100);
       this.$parent.$emit('Correct', player);
-      this.playVideo("correct");
+
+      console.log(points);
+
+      if (points === 4) {
+        this.playVideo("winner");
+      }else{
+        this.playVideo("correct");
+      }
+
     },
     incorrectFunction(){
       var vm = this;
       var led = new five.Led(13);
       this.stopTimer();
 
-      //console.log("NO BAD JOB");
-      led.blink(10);
-      this.playVideo("incorrect");
+      var check1 = this.guessed.indexOf("1");
+      var check2 = this.guessed.indexOf("2");
+
+      if (check1 != -1 && check2 != -1) {
+        console.log("RESET BOTH WRONG");
+        this.guessed = [];
+        this.playVideo("bothincorrect");
+      }else{
+        led.blink(10);
+        this.playVideo("incorrect");
+      }
     },
     timeOut(){
+      this.guessed = '';
       alert("TIMES UP");
       this.switchQuestion(vm.currentId);
     },
@@ -222,11 +258,22 @@ const PlayScreen = {
         incorrectVideo.onended = function() {
             vm.showVideo = false;
             vm.incorrect = false;
-            vm.playerAnswered = "playerOne";
             vm.resumeTimer();
-            //vm.switchQuestion();
         };
 
+      }else if(answer === "bothincorrect"){
+        this.incorrect = true;
+        this.showQuestion = false;
+        this.showAnswers = false;
+        this.showTimer = false;
+
+        var incorrectVideo = this.$el.querySelector('#incorrectVideo');
+        incorrectVideo.play();
+        incorrectVideo.onended = function() {
+            vm.showVideo = false;
+            vm.incorrect = false;
+            vm.switchQuestion();
+        };
       }else if(answer === "time"){
         console.log("TIME UP FUNCTION")
         this.timesUp = true;
@@ -240,6 +287,20 @@ const PlayScreen = {
             vm.showVideo = false;
             vm.timesUp = false;
             vm.switchQuestion();
+        };
+      }else if(answer === "winner"){
+        this.winner = true;
+        clearInterval(gameTime);
+
+        var winnerVideo = this.$el.querySelector('#winnerVideo');
+        winnerVideo.play();
+        this.showQuestion = false;
+        this.showAnswers = false;
+        this.showTimer = false;
+        winnerVideo.onended = function() {
+            vm.showVideo = false;
+            vm.timesUp = false;
+            vm.$router.push('gameOver');
         };
       }
     },
@@ -299,13 +360,16 @@ const PlayScreen = {
     <transition name="fade">
       <div id="video-container" v-show="showVideo">
           <transition name="fade">
-            <video id="correctVideo" src="videos/correct2.mp4" v-show="correct"></video>
+            <video id="correctVideo" src="videos/correct.mp4" v-show="correct"></video>
           </transition>
           <transition name="fade">
             <video id="incorrectVideo" src="videos/wrong.mp4" v-show="incorrect"></video>
           </transition>
           <transition name="fade">
-            <video id="timesUpVideo" src="videos/wrong.mp4" v-show="timesUp"></video>
+            <video id="timesUpVideo" src="videos/timesup.mp4" v-show="timesUp"></video>
+          </transition>
+          <transition name="fade">
+            <video id="winnerVideo" src="videos/winner.mp4" v-show="winner"></video>
           </transition>
       </div>
     </transition>
@@ -369,6 +433,27 @@ const PlayScreen = {
   </div>`
 }
 
+const GameOver = {
+  props: ['playerone', 'playertwo', 'answered', 'playeronepoints','playertwopoints','gametime'],
+  name: 'GameOver',
+  data(){
+    return{
+
+    }
+  },
+
+  methods: {
+
+  },
+
+  template: `
+  <div id="game-over">
+    <h2>Game Over</h2>
+    <h3>{{gametime}}</h3>
+
+  </div>`
+}
+
 const routes = [
     {
       path: '/',
@@ -389,7 +474,13 @@ const routes = [
       path: '/quiz',
       name: 'PlayOn',
       component: PlayScreen
+    },
+    {
+      path: '/gameOver',
+      name: 'GameOver',
+      component: GameOver
     }
+
 ]
 
 const router = new VueRouter({
@@ -404,14 +495,24 @@ new Vue({
       playerone: '',
       playertwo: '',
       questions: [],
-      playeronepoints: 0,
+      playeronepoints: 3,
       playertwopoints: 0,
+      gametime: 40,
+      winner: ''
     }
   },
   created() {
     this.$on('DefinePlayers',  (playerone, playertwo) => {
       this.playerone = playerone;
       this.playertwo = playertwo;
+    });
+    this.$on('GameTime',  gametime => {
+      this.gametime = gametime;
+      console.log(this.gametime);
+    });
+    this.$on('Winner',  winner => {
+      this.winner = winner;
+      console.log(this.gameTime);
     });
     this.$on('RemoveQuestion', (id) => {
       //console.log(this.questions);
