@@ -104,3 +104,35 @@
     max-width: 100%;
   }
 }
+
+#correct-container{
+  background: $green;
+  border-radius: 25px;
+  padding: 40px;
+  text-align: center;
+  align-self: center;
+  margin: 0 auto;
+
+
+
+  h2{
+    color: $white;
+    font-size: 1.75em;
+    margin-bottom: 20px;
+  }
+  h3{
+    color: $white;
+    font-size: 1.5em;
+    font-family: $gothamBook;
+
+    .capitalize{
+      font-family: $gothamBlack;
+      font-size: 1.75em;
+    }
+  }
+  // position: absolute;
+  // top: 0;
+  // bottom: 0;
+  // left: 0;
+  // right: 0;
+}

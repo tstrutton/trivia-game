@@ -35,7 +35,9 @@ const TeaserScreen = {
   },
   template: `
   <div id="teaser-screen" @click="closeTeaser">
-    <h2>TEASER</h2>
+  <div id="video-container">
+    <video id="promoVideo" src="videos/promo.mp4" autoplay loop></video>
+  </div>
   </div>`
 }
 
@@ -60,13 +62,11 @@ const StartScreen = {
       }
     },
     gameTimer(){
-      //console.log("GAME TIMER STARTED");
       gameTime = window.setInterval(this.gameClock, 1000);
     },
     gameClock(){
       this.timeElapsed ++;
       this.$parent.$emit('GameTime', this.timeElapsed);
-      //console.log(this.timeElapsed);
     }
   },
   template: `
@@ -100,7 +100,7 @@ const Tutorial = {
   template: `
   <div id="tutorial-screen">
     <div id="video-container">
-      <video id="teaserVideo" src="videos/rules.mp4" autoplay></video>
+      <video id="teaserVideo" src="videos/correct.mp4" autoplay></video>
     </div>
   </div>`
 }
@@ -115,6 +115,8 @@ const PlayScreen = {
       currentId: '',
       timerLength: '',
       timerSeconds: '',
+      correctAnswer: '',
+      correctId: '',
       showVideo: false,
       correct: false,
       incorrect: false,
@@ -122,6 +124,7 @@ const PlayScreen = {
       winner: false,
       showAnswers: false,
       showQuestion: false,
+      showCorrectAnswer: false,
       showTimer: false,
       guessed: [],
       play: false,
@@ -140,8 +143,20 @@ const PlayScreen = {
         //console.log(currentId);
         vm.currentQuestion = vm.questions[currentId];
         vm.currentId = currentId;
+
+        //Load the correct answer to show players
+        var answers = vm.currentQuestion.answers;
+        for (var i = 0; i < answers.length; i++) {
+          var answerId = answers[i].id;
+          if (answerId === vm.currentQuestion.answer) {
+            vm.correctAnswer = answers[i].answer;
+            vm.correctId = answerId;
+          }
+        }
+
       })
     this.loadQuestions();
+
   },
   methods: {
     loadQuestions(){
@@ -150,6 +165,11 @@ const PlayScreen = {
       setTimeout(() => this.showTimer = true, 4600);
       setTimeout(() => this.startTimer(), 4500);
     },
+    showAnswer(){
+      this.showCorrectAnswer = true;
+      setTimeout(() => this.showCorrectAnswer = false, 4000);
+      setTimeout(() => this.switchQuestion() , 5000);
+    },
     switchQuestion(currentId){
       var vm = this;
       vm.$parent.$emit('RemoveQuestion', vm.currentId);
@@ -157,6 +177,16 @@ const PlayScreen = {
       currentId = Math.floor(Math.random()*limit);
       vm.currentQuestion = vm.questions[currentId];
       vm.currentId = currentId;
+
+      //Load the correct answer to show players
+      var answers = vm.currentQuestion.answers;
+      for (var i = 0; i < answers.length; i++) {
+        var answerId = answers[i].id;
+        if (answerId === vm.currentQuestion.answer) {
+          vm.correctAnswer = answers[i].answer;
+          vm.correctId = answerId;
+        }
+      }
       this.loadQuestions();
     },
     questionGuess: function(e,player){
@@ -167,7 +197,7 @@ const PlayScreen = {
 
       //Only allow players to guess once
       if (check != -1) {
-        console.log("Already answered");
+        //console.log("Already answered");
       }else{
         //Only allow questions to be answered when play is true
         if (this.play == true) {
@@ -184,7 +214,6 @@ const PlayScreen = {
         }else{
           console.log("Cant answer right now.");
         }
-
       }
 
     },
@@ -204,7 +233,7 @@ const PlayScreen = {
       led.blink(100);
       this.$parent.$emit('Correct', player);
 
-      console.log(points);
+      //console.log(points);
 
       if (points === 4) {
         this.$parent.$emit('Winner', player);
@@ -249,7 +278,8 @@ const PlayScreen = {
         correctVideo.onended = function() {
             vm.showVideo = false;
             vm.correct = false;
-            vm.switchQuestion();
+            vm.showAnswer();
+            //vm.switchQuestion();
         };
 
       }else if (answer === "incorrect") {
@@ -274,7 +304,8 @@ const PlayScreen = {
         incorrectVideo.onended = function() {
             vm.showVideo = false;
             vm.incorrect = false;
-            vm.switchQuestion();
+            //vm.switchQuestion();
+            vm.showAnswer();
         };
       }else if(answer === "time"){
         console.log("TIME UP FUNCTION")
@@ -288,7 +319,8 @@ const PlayScreen = {
         timesUpVideo.onended = function() {
             vm.showVideo = false;
             vm.timesUp = false;
-            vm.switchQuestion();
+            vm.showAnswer();
+            //vm.switchQuestion();
         };
       }else if(answer === "winner"){
         this.winner = true;
@@ -398,12 +430,11 @@ const PlayScreen = {
     </div>
 
     <!-- Questions Start -->
-    <div id="question-container">
-      <transition name="grow">
-        <div id="question" v-show="showQuestion">
+    <transition name="grow">
+    <div id="question-container" v-show="showQuestion">
+        <div id="question" >
           <h2>{{currentQuestion.question}}</h2>
         </div>
-      </transition>
 
       <transition-group name="grow">
         <div :id="'answer-'+answer.id" class="answer-container"  v-show="showAnswers" v-for="answer in currentQuestion.answers" :key="answer.id">
@@ -414,7 +445,17 @@ const PlayScreen = {
       </transition-group>
 
     </div>
+    </transition>
     <!-- Questions End -->
+
+    <!-- Correct Answer Start -->
+    <transition name="grow">
+      <div id="correct-container" v-show="showCorrectAnswer">
+        <h2>{{currentQuestion.question}}</h2>
+        <h3>{{correctAnswer}}</h3>
+      </div>
+    </transition>
+    <!-- Correct Answer End -->
 
     <div id="buttonCon1" class="buttonCon">
       <h2>Player 1</h2>
