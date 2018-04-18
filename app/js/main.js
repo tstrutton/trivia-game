@@ -67,6 +67,9 @@ const StartScreen = {
     gameClock(){
       this.timeElapsed ++;
       this.$parent.$emit('GameTime', this.timeElapsed);
+    },
+    showLeaderBoard(){
+      this.$router.push('leaderboard');
     }
   },
   template: `
@@ -85,6 +88,7 @@ const StartScreen = {
     </div>
 
     <button class="button" id="name-button" @click="startGame(playerone,playertwo)">Start</button>
+    <button class="button" id="leaderboard-button" @click="showLeaderBoard">View Leaderboard</button>
     </div>
   </div>`
 }
@@ -105,6 +109,76 @@ const Tutorial = {
   </div>`
 }
 
+const Leaderboard = {
+  name: 'Leaderboard',
+  data(){
+    return{
+      leaderboard: []
+    }
+  },
+  mounted(){
+    var vm = this;
+    var leaderboard = vm.leaderboard;
+
+    var table = vm.$el.querySelector("#leaderboard");
+    var tr = [];
+
+    for ( var i = 0, len = localStorage.length; i < len; ++i ) {
+      //console.log(localStorage.key(i));
+      //console.log( localStorage.getItem( localStorage.key( i ) ) );
+      var data = localStorage.getItem(localStorage.key(i));
+      var data = JSON.parse(data);
+
+      var keyTime = localStorage.key(i);
+      var date = new Date(keyTime*1);
+      var date = date.toLocaleString();
+      var date = date.slice(-11);
+      var entry = {time:date,name:data.name,score:data.score};
+
+      leaderboard.push(entry);
+    }
+
+    leaderboard.sort((a, b) => a.score - b.score);
+    console.log(leaderboard);
+
+    //Sort Leaderboard by lowest score at top (shortest time)
+    for (var i = 0; i < leaderboard.length; i++) {
+      //leaderboard[i]
+      var data = leaderboard[i];
+      tr[i] = document.createElement('tr');
+      var td1 = document.createElement('td');
+      var td2 = document.createElement('td');
+      var td3 = document.createElement('td');
+      td1.innerHTML = data.name;
+      td2.innerHTML = data.score;
+      td3.innerHTML = data.time;
+      tr[i].appendChild(td1);
+      tr[i].appendChild(td2);
+      tr[i].appendChild(td3);
+      table.appendChild(tr[i]);
+    }
+  },
+  methods:{
+    backToStart(){
+      router.push('start');
+    }
+  },
+  template: `
+  <div id="leaderboard-screen">
+    <div>
+      <button class="button" id="back-button" @click="backToStart">Back</button>
+      <h2 id="leaderboard-title">Leaderboard</h2>
+      <table id="leaderboard">
+        <tr id="table-head">
+          <th>Name</th>
+          <th>Time</th>
+          <th>Date</th>
+        </tr>
+      </table>
+    </div>
+  </div>`
+}
+
 const PlayScreen = {
   props: ['playerone', 'playertwo', 'answered', 'playeronepoints','playertwopoints'],
   name: 'PlayScreen',
@@ -117,6 +191,7 @@ const PlayScreen = {
       timerSeconds: '',
       correctAnswer: '',
       correctId: '',
+      incorrectId: [],
       showVideo: false,
       correct: false,
       incorrect: false,
@@ -151,24 +226,39 @@ const PlayScreen = {
           if (answerId === vm.currentQuestion.answer) {
             vm.correctAnswer = answers[i].answer;
             vm.correctId = answerId;
+            console.log(vm.correctId+" - "+vm.correctAnswer);
+          }else{
+            vm.incorrectId.push(answerId);
           }
         }
+        //console.log(vm.incorrectId);
 
       })
     this.loadQuestions();
 
   },
   methods: {
-    loadQuestions(){
-      setTimeout(() => this.showQuestion = true, 1000);
-      setTimeout(() => this.showAnswers = true, 4000);
-      setTimeout(() => this.showTimer = true, 4600);
-      setTimeout(() => this.startTimer(), 4500);
-    },
     showAnswer(){
+      var vm = this;
+      //reloadQuestions();
+
       this.showCorrectAnswer = true;
       setTimeout(() => this.showCorrectAnswer = false, 4000);
       setTimeout(() => this.switchQuestion() , 5000);
+
+      function reloadQuestions(){
+
+        //console.log(this.currentQuestion);
+        var fixArray = ["a","b","c","d"];
+        //Remove the styling for removing answers at times
+        for (var i = 0; i < fixArray.length; i++) {
+          var id = fixArray[i];
+          var containerId = "#answer-"+id;
+          var container = vm.$el.querySelector(containerId);
+          container.removeAttribute("style");
+        }
+
+      }
     },
     switchQuestion(currentId){
       var vm = this;
@@ -177,6 +267,7 @@ const PlayScreen = {
       currentId = Math.floor(Math.random()*limit);
       vm.currentQuestion = vm.questions[currentId];
       vm.currentId = currentId;
+      vm.incorrectId = [];
 
       //Load the correct answer to show players
       var answers = vm.currentQuestion.answers;
@@ -185,9 +276,22 @@ const PlayScreen = {
         if (answerId === vm.currentQuestion.answer) {
           vm.correctAnswer = answers[i].answer;
           vm.correctId = answerId;
+          console.log(vm.correctId+" - "+vm.correctAnswer);
+        }else{
+          vm.incorrectId.push(answerId);
         }
       }
       this.loadQuestions();
+    },
+    loadQuestions(){
+      var vm = this;
+
+      //Give time to load question, then answers, then start the timer
+      setTimeout(() => this.showQuestion = true, 1000);
+      setTimeout(() => this.showAnswers = true, 4000);
+      //setTimeout(() => reloadQuestions(), 4000);
+      setTimeout(() => this.showTimer = true, 4600);
+      setTimeout(() => this.startTimer(), 4500);
     },
     questionGuess: function(e,player){
       var vm = this;
@@ -215,12 +319,10 @@ const PlayScreen = {
           console.log("Cant answer right now.");
         }
       }
-
     },
     correctFunction(player){
       this.guessed = [];
       var vm = this;
-      var led = new five.Led(13);
       this.stopTimer();
       var points;
 
@@ -230,7 +332,6 @@ const PlayScreen = {
         points = this.playertwopoints;
       }
 
-      led.blink(100);
       this.$parent.$emit('Correct', player);
 
       //console.log(points);
@@ -240,9 +341,9 @@ const PlayScreen = {
         clearInterval(gameTime);
         this.playVideo("winner");
       }else{
+        this.resetAnswers();
         this.playVideo("correct");
       }
-
     },
     incorrectFunction(){
       var vm = this;
@@ -255,16 +356,24 @@ const PlayScreen = {
       if (check1 != -1 && check2 != -1) {
         console.log("RESET BOTH WRONG");
         this.guessed = [];
+        this.resetAnswers();
         this.playVideo("bothincorrect");
       }else{
         led.blink(10);
         this.playVideo("incorrect");
       }
     },
-    timeOut(){
-      this.guessed = '';
-      alert("TIMES UP");
-      this.switchQuestion(vm.currentId);
+    resetAnswers(){
+      var vm = this;
+      var fixArray = ["a","b","c","d"];
+      //Remove the styling for removing answers at times
+      for (var i = 0; i < fixArray.length; i++) {
+        var id = fixArray[i];
+        var containerId = "#answer-"+id;
+        var container = vm.$el.querySelector(containerId);
+        container.removeAttribute("style");
+      }
+
     },
     playVideo(answer){
       var vm = this;
@@ -308,11 +417,12 @@ const PlayScreen = {
             vm.showAnswer();
         };
       }else if(answer === "time"){
-        console.log("TIME UP FUNCTION")
+        //console.log("TIME UP FUNCTION")
         this.timesUp = true;
 
         var timesUpVideo = this.$el.querySelector('#timesUpVideo');
         timesUpVideo.play();
+        this.resetAnswers();
         this.showQuestion = false;
         this.showAnswers = false;
         this.showTimer = false;
@@ -363,14 +473,34 @@ const PlayScreen = {
       timerObj = null;
     },
     timerTick(){
-      //console.log(this.timerSeconds);
-      //console.log(this.timerLength);
-      if (this.timerLength != 0) {
+      var vm = this;
+
+      function removeWrong(){
+        var wrongId = vm.incorrectId;
+        var limit = wrongId.length;
+        var removeId = Math.floor(Math.random()*limit);
+        var removeLetter = wrongId[removeId];
+
+        var containerId = "#answer-"+removeLetter;
+        var container = vm.$el.querySelector(containerId);
+
+        container.style.opacity="0";
+        wrongId.splice(removeId,1);
+      }
+
+      if (this.timerLength === 40) {
+        removeWrong();
+      }else if(this.timerLength === 20){
+        removeWrong();
+      }
+
+      if(this.timerLength != 0){
           this.timerLength -= 1;
           this.timerBarWidth();
           this.timerSeconds = this.timerLength;
           this.timerFormat();
-      }else{
+      }
+      else{
           console.log("TIMES UP");
           this.stopTimer();
           this.playVideo("time");
@@ -436,13 +566,15 @@ const PlayScreen = {
           <h2>{{currentQuestion.question}}</h2>
         </div>
 
-      <transition-group name="grow">
-        <div :id="'answer-'+answer.id" class="answer-container"  v-show="showAnswers" v-for="answer in currentQuestion.answers" :key="answer.id">
-          <h3>{{answer.id}}</h3>
-          <h4>{{answer.answer}}</h4>
-          <!-- <h3>{{answer.id}}</h3> -->
-        </div>
-      </transition-group>
+
+        <transition-group name="grow">
+          <div :id="'answer-'+answer.id" class="answer-container" v-show="showAnswers" v-for="answer in currentQuestion.answers" :key="answer.id">
+            <h3>{{answer.id}}</h3>
+            <h4>{{answer.answer}}</h4>
+            <!-- <h3>{{answer.id}}</h3> -->
+          </div>
+        </transition-group>
+
 
     </div>
     </transition>
@@ -476,25 +608,31 @@ const PlayScreen = {
 }
 
 const GameOver = {
-  props: ['playerone','playertwo','gametime','winner'],
+  props: ['playerone','playertwo','winner','gametime'],
   name: 'GameOver',
   data(){
     return{
-      winnerName: ''
+      winnerName: '',
+      gametime: '',
     }
   },
   methods: {
     saveScore(){
-      console.log(this.winnerName);
-      console.log(this.gametime);
-      this.$router.push('/');
+      // console.log(this.winnerName);
+      // console.log(this.gametime);
+      var name = this.winnerName;
+      var score = this.gametime;
 
+      var score = {name:name, score:score};
+      var time = Date.now();
 
+      localStorage.setItem(time, JSON.stringify(score));
+      this.$router.push('leaderboard');
     }
 
   },
   created(){
-    console.log(this.winner);
+    //console.log(this.winner);
     var winner = this.winner;
     if (winner=== "1") {
       this.winnerName = this.playerone;
@@ -522,6 +660,11 @@ const routes = [
       path: '/start',
       name: 'StartScreen',
       component: StartScreen
+    },
+    {
+      path: '/leaderboard',
+      name: 'Leaderboard',
+      component: Leaderboard
     },
     {
       path: '/tutorial',
@@ -553,7 +696,7 @@ new Vue({
       playerone: '',
       playertwo: '',
       questions: [],
-      playeronepoints: 0,
+      playeronepoints: 4,
       playertwopoints: 0,
       gametime: 0,
       winner: 0

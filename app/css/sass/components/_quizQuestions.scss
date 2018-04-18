@@ -44,16 +44,20 @@
 
 #answer-a{
   background: transparentize($grey,.2);
+  transition: opacity 1s;
 }
 
 #answer-b{
   background: transparentize($red,.2);
+  transition: opacity 1s;
 }
 
 #answer-c{
   background: transparentize($yellow,.2);
+  transition: opacity 1s;
 }
 
 #answer-d{
   background: transparentize($green,.2);
+  transition: opacity 1s;
 }

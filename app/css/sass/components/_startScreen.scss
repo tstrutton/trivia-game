@@ -60,13 +60,31 @@
   		background: none;
   	}
   }
+
+  #leaderboard-button{
+    background: none;
+    margin: 40px auto 0 auto;
+  	display: block;
+  	background: none;
+  	color: $white;
+  	border-radius: 10px;
+  	font-size: 1.25em;
+  	padding: 15px 40px;
+  	transition: 0.4s;
+    font-size: 1em;
+    font-family: $gothamBook;
+
+    &:hover{
+  		opacity: 0.75;
+  	}
+  }
 }
 
 .warning-box{
   opacity: 0;
   text-align: center;
   margin: 0px 0 50px 0;
-  
+
   h2{
   	font-size: 1.25em;
   	font-family: $gothamBook;

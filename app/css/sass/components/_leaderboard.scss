@@ -1,0 +1,51 @@
+#leaderboard-screen{
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  background: url('../images/background.png');
+  background-size: cover;
+  background-position: center;
+  padding: 50px;
+  box-sizing: border-box;
+}
+
+#leaderboard-title{
+  text-align: center;
+  color: $white;
+  font-size: 2em;
+  margin-bottom: 40px;
+}
+
+#leaderboard{
+  color: $white;
+  margin: 0 auto;
+  width: 470px;
+
+  td{
+    min-width: 150px;
+    padding: 5px 0;
+  }
+
+
+  #table-head{
+    th{
+      text-align: left;
+      font-size: 1.25em;
+      font-family: $gothamBlack;
+
+    }
+
+  }
+
+}
+
+#back-button{
+  border: 2px solid $white;
+  color: $white;
+  background: none;
+  transition: 0.3s;
+
+  &:hover{
+    background: transparentize($white,0.8);
+  }
+}
