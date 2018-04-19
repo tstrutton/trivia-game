@@ -1,0 +1,45 @@
+#game-over{
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  background: url('../images/background.png');
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#game-over-inner{
+  text-align: center;
+  color: $white;
+
+  h2{
+    font-size: 2em;
+    margin-bottom: 40px;
+  }
+
+  #winner-name{
+    margin-bottom: 10px;
+  }
+
+  #winner-score{
+    margin-bottom: 40px;
+
+  }
+
+  .button{
+    margin: 75px auto 0 auto;
+  	display: block;
+  	background: $green;
+  	color: $white;
+  	border-radius: 10px;
+  	font-size: 1em;
+  	padding: 15px 30px;
+  	border: 2px solid $green;
+  	transition: 0.4s;
+
+  	&:hover{
+  		background: none;
+  	}
+
+  }
+}

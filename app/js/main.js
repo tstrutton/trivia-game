@@ -14,13 +14,6 @@ process.__defineGetter__('stdin', function() {
   return process.__stdin
 })
 
-var board = new five.Board();
-
-board.on("ready", function() {
-  var led = new five.Led(13);
-  led.blink(500);
-});
-
 const TeaserScreen = {
   name: 'TeaserScreen',
   data() {
@@ -30,7 +23,7 @@ const TeaserScreen = {
   },
   methods: {
     closeTeaser(){
-      this.$router.push('start');
+      this.$router.replace('start');
     }
   },
   template: `
@@ -57,7 +50,7 @@ const StartScreen = {
         this.warningActive = true;
       }else{
         this.$parent.$emit('DefinePlayers', playerone, playertwo);
-        this.$router.push('tutorial');
+        this.$router.replace('tutorial');
         this.gameTimer();
       }
     },
@@ -69,7 +62,7 @@ const StartScreen = {
       this.$parent.$emit('GameTime', this.timeElapsed);
     },
     showLeaderBoard(){
-      this.$router.push('leaderboard');
+      this.$router.replace('leaderboard');
     }
   },
   template: `
@@ -98,13 +91,13 @@ const Tutorial = {
   mounted(){
     var teaserVideo = this.$el.querySelector('#teaserVideo');
     teaserVideo.onended = function() {
-        router.push('quiz');
+        router.replace('quiz');
     };
   },
   template: `
   <div id="tutorial-screen">
     <div id="video-container">
-      <video id="teaserVideo" src="videos/correct.mp4" autoplay></video>
+      <video id="teaserVideo" src="videos/rules.mp4" autoplay></video>
     </div>
   </div>`
 }
@@ -139,7 +132,7 @@ const Leaderboard = {
     }
 
     leaderboard.sort((a, b) => a.score - b.score);
-    console.log(leaderboard);
+    //console.log(leaderboard);
 
     //Sort Leaderboard by lowest score at top (shortest time)
     for (var i = 0; i < leaderboard.length; i++) {
@@ -180,7 +173,7 @@ const Leaderboard = {
 }
 
 const PlayScreen = {
-  props: ['playerone', 'playertwo', 'answered', 'playeronepoints','playertwopoints'],
+  props: ['playerone', 'playertwo', 'answered', 'playeronepoints','playertwopoints','board'],
   name: 'PlayScreen',
   data(){
     return{
@@ -206,16 +199,15 @@ const PlayScreen = {
     }
   },
   created(){
+
     var vm = this;
     axios.get('../questions/questions.json')
       .then((res) => {
-        //console.log(res.data);
         vm.questions = res.data
         this.$parent.$emit('LoadQuestions', vm.questions);
 
         var limit = vm.questions.length;
         var currentId = Math.floor(Math.random()*limit);
-        //console.log(currentId);
         vm.currentQuestion = vm.questions[currentId];
         vm.currentId = currentId;
 
@@ -231,34 +223,123 @@ const PlayScreen = {
             vm.incorrectId.push(answerId);
           }
         }
-        //console.log(vm.incorrectId);
 
       })
-    this.loadQuestions();
+
+      // new five.Boards([ "A", "B" ]).on("ready", function() {
+      //
+      //   //Player One Buttons
+      //   var p1b1 = new five.Button({ pin: 8, board: this[0] });
+      //   var p1b2 = new five.Button({ pin: 7, board: this[0] });
+      //   var p1b3 = new five.Button({ pin: 4, board: this[0] });
+      //   var p1b4 = new five.Button({ pin: 2, board: this[0] });
+      //
+      //   p1b1.on("press", function(){
+      //     //console.log("Player 1 Button 1");
+      //     vm.questionGuess('a','1');
+      //   });
+      //   p1b2.on("press", function(){
+      //     //console.log("Player 1 Button 2");
+      //     vm.questionGuess('b','1');
+      //   });
+      //   p1b3.on("press", function(){
+      //     //console.log("Player 1 Button 3");
+      //     vm.questionGuess('c','1');
+      //   });
+      //   p1b4.on("press", function(){
+      //     //console.log("Player 1 Button 4");
+      //     vm.questionGuess('d','1');
+      //   });
+      //
+      //   //Player Two Buttons
+      //   var p2b1 = new five.Button({ pin: 8, board: this[1] });
+      //   var p2b2 = new five.Button({ pin: 7, board: this[1] });
+      //   var p2b3 = new five.Button({ pin: 4, board: this[1] });
+      //   var p2b4 = new five.Button({ pin: 2, board: this[1] });
+      //
+      //   p2b1.on("press", function(){
+      //     console.log("Player 2 button 1");
+      //     vm.questionGuess('a','2');
+      //   });
+      //   //
+      //   p2b2.on("press", function(){
+      //     console.log("Player 2 button 2");
+      //     vm.questionGuess('b','2');
+      //   });
+      //   p2b3.on("press", function(){
+      //     console.log("Player 2 button 3");
+      //     vm.questionGuess('c','2');
+      //   });
+      //   p2b4.on("press", function(){
+      //     console.log("Player 2 button 4");
+      //     vm.questionGuess('d','2');
+      //   });
+      //
+      // });
+
+
+  vm.loadQuestions();
+
+  },
+  mounted(){
+    var vm = this;
+
+      //Player one buttons
+      var p1b1 = new five.Button({ pin: 8, board: this.board[0] });
+      var p1b2 = new five.Button({ pin: 7, board: this.board[0] });
+      var p1b3 = new five.Button({ pin: 4, board: this.board[0] });
+      var p1b4 = new five.Button({ pin: 2, board: this.board[0] });
+      //Player two buttons
+      var p2b1 = new five.Button({ pin: 8, board: this.board[1] });
+      var p2b2 = new five.Button({ pin: 7, board: this.board[1] });
+      var p2b3 = new five.Button({ pin: 4, board: this.board[1] });
+      var p2b4 = new five.Button({ pin: 2, board: this.board[1] });
+
+      p1b1.on("press", function(){
+        //console.log("Player 1 Button 1");
+        vm.questionGuess('a','1');
+      });
+      p1b2.on("press", function(){
+        //console.log("Player 1 Button 2");
+        vm.questionGuess('b','1');
+      });
+      p1b3.on("press", function(){
+        //console.log("Player 1 Button 3");
+        vm.questionGuess('c','1');
+      });
+      p1b4.on("press", function(){
+        //console.log("Player 1 Button 4");
+        vm.questionGuess('d','1');
+      });
+
+      p2b1.on("press", function(){
+        console.log("Player 2 button 1");
+        vm.questionGuess('a','2');
+      });
+      //
+      p2b2.on("press", function(){
+        console.log("Player 2 button 2");
+        vm.questionGuess('b','2');
+      });
+      p2b3.on("press", function(){
+        console.log("Player 2 button 3");
+        vm.questionGuess('c','2');
+      });
+      p2b4.on("press", function(){
+        console.log("Player 2 button 4");
+        vm.questionGuess('d','2');
+      });
+
+
 
   },
   methods: {
     showAnswer(){
       var vm = this;
-      //reloadQuestions();
-
       this.showCorrectAnswer = true;
-      setTimeout(() => this.showCorrectAnswer = false, 4000);
-      setTimeout(() => this.switchQuestion() , 5000);
+      setTimeout(() => vm.showCorrectAnswer = false, 4000);
+      setTimeout(() => vm.switchQuestion() , 5000);
 
-      function reloadQuestions(){
-
-        //console.log(this.currentQuestion);
-        var fixArray = ["a","b","c","d"];
-        //Remove the styling for removing answers at times
-        for (var i = 0; i < fixArray.length; i++) {
-          var id = fixArray[i];
-          var containerId = "#answer-"+id;
-          var container = vm.$el.querySelector(containerId);
-          container.removeAttribute("style");
-        }
-
-      }
     },
     switchQuestion(currentId){
       var vm = this;
@@ -285,39 +366,42 @@ const PlayScreen = {
     },
     loadQuestions(){
       var vm = this;
-
       //Give time to load question, then answers, then start the timer
-      setTimeout(() => this.showQuestion = true, 1000);
-      setTimeout(() => this.showAnswers = true, 4000);
-      //setTimeout(() => reloadQuestions(), 4000);
-      setTimeout(() => this.showTimer = true, 4600);
-      setTimeout(() => this.startTimer(), 4500);
+      setTimeout(() => vm.showQuestion = true, 1000);
+      setTimeout(() => vm.showAnswers = true, 4000);
+      setTimeout(() => vm.showTimer = true, 4600);
+      setTimeout(() => vm.startTimer(), 4500);
     },
     questionGuess: function(e,player){
+      //Weird Bug console
+      //console.log(this);
       var vm = this;
-      var correctAnswer = vm.currentQuestion.answer;
-      var led = new five.Led(13);
-      var check = this.guessed.indexOf(player);
+      if (this.play == true) {
 
-      //Only allow players to guess once
-      if (check != -1) {
-        //console.log("Already answered");
-      }else{
-        //Only allow questions to be answered when play is true
-        if (this.play == true) {
-          this.guessed.push(player);
+        var correctAnswer = vm.currentQuestion.answer;
+        var check = vm.guessed.indexOf(player);
 
-          if(e === correctAnswer) {
-            this.correctFunction(player);
-            this.showQuestion = false;
-            this.showAnswers = false;
-            this.showTimer = false;
-          }else{
-            this.incorrectFunction(player);
-          }
+        //Only allow players to guess once
+        if (check != -1) {
+          console.log("Already guessed");
         }else{
-          console.log("Cant answer right now.");
+          //Only allow questions to be answered when play is true
+          if (vm.play == true) {
+            this.guessed.push(player);
+
+            if(e === correctAnswer) {
+              vm.correctFunction(player);
+              vm.showQuestion = false;
+              vm.showAnswers = false;
+              vm.showTimer = false;
+            }else{
+              vm.incorrectFunction(player);
+            }
+          }else{
+          }
+
         }
+      }else{
       }
     },
     correctFunction(player){
@@ -334,8 +418,6 @@ const PlayScreen = {
 
       this.$parent.$emit('Correct', player);
 
-      //console.log(points);
-
       if (points === 4) {
         this.$parent.$emit('Winner', player);
         clearInterval(gameTime);
@@ -347,19 +429,16 @@ const PlayScreen = {
     },
     incorrectFunction(){
       var vm = this;
-      var led = new five.Led(13);
       this.stopTimer();
 
       var check1 = this.guessed.indexOf("1");
       var check2 = this.guessed.indexOf("2");
 
       if (check1 != -1 && check2 != -1) {
-        console.log("RESET BOTH WRONG");
         this.guessed = [];
         this.resetAnswers();
         this.playVideo("bothincorrect");
       }else{
-        led.blink(10);
         this.playVideo("incorrect");
       }
     },
@@ -444,7 +523,8 @@ const PlayScreen = {
             vm.showVideo = false;
             vm.timesUp = false;
             vm.$emit.winner
-            vm.$router.push('gameOver');
+            vm.$destroy();
+            vm.$router.replace('gameOver');
         };
       }
     },
@@ -453,7 +533,6 @@ const PlayScreen = {
       this.play = true;
       this.timerLength = 60;
 
-      console.log("TIMER STARTED");
       //Use timer seconds for the visual aspect of timer
       this.timerSeconds = this.timerLength;
 
@@ -501,10 +580,8 @@ const PlayScreen = {
           this.timerFormat();
       }
       else{
-          console.log("TIMES UP");
           this.stopTimer();
           this.playVideo("time");
-          // Some broadcast stuff to disable answering
       }
     },
     timerFormat(){
@@ -618,8 +695,6 @@ const GameOver = {
   },
   methods: {
     saveScore(){
-      // console.log(this.winnerName);
-      // console.log(this.gametime);
       var name = this.winnerName;
       var score = this.gametime;
 
@@ -627,12 +702,13 @@ const GameOver = {
       var time = Date.now();
 
       localStorage.setItem(time, JSON.stringify(score));
-      this.$router.push('leaderboard');
+      this.$router.replace('leaderboard');
     }
 
   },
   created(){
     //console.log(this.winner);
+    this.$parent.$emit('ResetScore');
     var winner = this.winner;
     if (winner=== "1") {
       this.winnerName = this.playerone;
@@ -643,10 +719,13 @@ const GameOver = {
 
   template: `
   <div id="game-over">
-    <h2>Game Over</h2>
-    <h4>{{winnerName}}</h4>
-    <h3>Your winning time: {{gametime}} seconds</h3>
-    <button @click="saveScore">Submit Your Score!</button>
+    <div id="game-over-inner">
+      <h2>Game Over</h2>
+      <h3 id="winner-name">Winner: {{winnerName}}</h3>
+      <h3 id="winner-score">Winning Time: {{gametime}} seconds</h3>
+      <button class="button" @click="saveScore">Submit Your Score!</button>
+    </div>
+
   </div>`
 }
 
@@ -681,7 +760,6 @@ const routes = [
       name: 'GameOver',
       component: GameOver
     }
-
 ]
 
 const router = new VueRouter({
@@ -696,43 +774,67 @@ new Vue({
       playerone: '',
       playertwo: '',
       questions: [],
-      playeronepoints: 4,
+      playeronepoints: 0,
       playertwopoints: 0,
       gametime: 0,
-      winner: 0
+      winner: 0,
+      board: ''
     }
   },
   created() {
+    //Reset Leaderboard
+    // localStorage.clear();
+    // console.log(localStorage);
+
     this.$on('DefinePlayers',  (playerone, playertwo) => {
       this.playerone = playerone;
       this.playertwo = playertwo;
     });
     this.$on('GameTime',  gametime => {
       this.gametime = gametime;
-      console.log(this.gametime);
+      //console.log(this.gametime);
     });
     this.$on('Winner',  winner => {
       this.winner = winner;
     });
     this.$on('RemoveQuestion', (id) => {
-      //console.log(this.questions);
       //Remove the current questions
       this.questions.splice(id,1);
-      //console.log(this.questions);
     });
     this.$on('Correct', (player) => {
-      console.log("REACHED");
-      //console.log(player);
       if(player == 1) {
         this.playeronepoints ++;
       }else if(player == 2){
         this.playertwopoints ++;
       }
     });
+    this.$on('ResetScore', (e) => {
+      this.playeronepoints = 0;
+      this.playertwopoints = 0;
+    });
     this.$on('LoadQuestions', (questions) => {
       //set questions to be all questions
       this.questions = questions;
     });
+
+    this.board = new five.Boards([ "A", "B" ]);
+    console.log(this.board);
+
+    // new five.Boards([ "A", "B" ]).on("ready", function() {
+    //   //console.log("Board Ready");
+    //   // var p1b1 = new five.Button({ pin: 8, board: this[0] });
+    //   // var p1b2 = new five.Button({ pin: 7, board: this[0] });
+    //   // var p1b3 = new five.Button({ pin: 4, board: this[0] });
+    //   // var p1b4 = new five.Button({ pin: 2, board: this[0] });
+    //   //
+    //   //
+    //   // //Player Two Buttons
+    //   // var p2b1 = new five.Button({ pin: 8, board: this[1] });
+    //   // var p2b2 = new five.Button({ pin: 7, board: this[1] });
+    //   // var p2b3 = new five.Button({ pin: 4, board: this[1] });
+    //   // var p2b4 = new five.Button({ pin: 2, board: this[1] });
+    //
+    // });
 
   },
 })

@@ -1,13 +1,3 @@
-//Questions I left out / coulcnt come up with answers for:
-// EASY
-// 6. What IMS means? (Interactive Media Specialist)
-// MEDIUM
-// 14. What is the name of the Supervisor, Centre for Digital and Performance Arts? (Michelle Giroux)
-// 20. Which one is the College motto? (Unlocking Potential)
-// HARD
-// 21. Where are the students presentation located?
-// 25. What is the name of Fanshawe’s Mascot? (Freddie the Falcon)
-
 [
 	{
 		"id": "1",
@@ -114,32 +104,6 @@
 		]
 	},
 	{
-		"id": "5",
-		"difficulty":"easy",
-		"card": false,
-		"answer": "a",
-		"question": "When is Industry Night?",
-		"answered": false,
-		"answers": [
-			{
-				"id": "a",
-				"answer": "April 25, 2018"
-			},
-			{
-				"id": "b",
-				"answer": "May 25, 2018"
-			},
-			{
-				"id": "c",
-				"answer": "April 1, 2018"
-			},
-			{
-				"id": "d",
-				"answer": "May 1,2018"
-			}
-		]
-	},
-	{
 		"id": "6",
 		"difficulty":"easy",
 		"card": false,
@@ -149,7 +113,7 @@
 		"answers": [
 			{
 				"id": "a",
-				"answer": ""
+				"answer": "Interactive Media Studies"
 			},
 			{
 				"id": "b",
@@ -157,11 +121,11 @@
 			},
 			{
 				"id": "c",
-				"answer": ""
+				"answer": "Independent Management in Society"
 			},
 			{
 				"id": "d",
-				"answer": ""
+				"answer": "Inclusive Maker Space"
 			}
 		]
 	},
@@ -222,7 +186,7 @@
 		"difficulty":"easy",
 		"card": false,
 		"answer": "b",
-		"question": "Which of the following IS NOT one of the student's presentations? ",
+		"question": "Which of the following IS NOT one of the student's presentations?",
 		"answered": false,
 		"answers": [
 			{
@@ -231,7 +195,7 @@
 			},
 			{
 				"id": "b",
-				"answer": "Trivia: Industry Night"
+				"answer": "Industry Night Trivia"
 			},
 			{
 				"id": "c",
@@ -270,37 +234,11 @@
 		]
 	},
 	{
-		"id": "11",
-		"difficulty":"medium",
-		"card": false,
-		"answer": "d",
-		"question": "?",
-		"answered": false,
-		"answers": [
-			{
-				"id": "a",
-				"answer": "5"
-			},
-			{
-				"id": "b",
-				"answer": "8"
-			},
-			{
-				"id": "c",
-				"answer": "4"
-			},
-			{
-				"id": "d",
-				"answer": "7"
-			}
-		]
-	},
-	{
 		"id": "12",
 		"difficulty":"medium",
 		"card": false,
 		"answer": "a",
-		"question": "When did the Center for Digital and Performance Art open its doors?",
+		"question": "When did the Center for Digital and Performance Arts open its doors?",
 		"answered": false,
 		"answers": [
 			{
@@ -352,7 +290,7 @@
 		"difficulty":"medium",
 		"card": false,
 		"answer": "d",
-		"question": "Who is the Supervisor for Centre for Digital and Performance Arts?",
+		"question": "Who is the Supervisor for the Centre of Digital and Performance Arts?",
 		"answered": false,
 		"answers": [
 			{
