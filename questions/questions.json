@@ -3,6 +3,7 @@
 		"id": "1",
 		"difficulty":"easy",
 		"card": false,
+		"location":"",
 		"answer": "a",
 		"question": "When was Fanshawe College founded?",
 		"answered": false,
@@ -29,6 +30,7 @@
 		"id": "2",
 		"difficulty":"easy",
 		"card": false,
+		"location":"",
 		"answer": "c",
 		"question": "How many programs are at Fanshawe's downtown campus?",
 		"answered": false,
@@ -55,6 +57,7 @@
 		"id": "3",
 		"difficulty":"easy",
 		"card": false,
+		"location":"",
 		"answer": "b",
 		"question": "What are Fanshawe's colours?",
 		"answered": false,
@@ -81,6 +84,7 @@
 		"id": "4",
 		"difficulty":"easy",
 		"card": false,
+		"location":"",
 		"answer": "d",
 		"question": "What is the name of Fanshawe's downtown campus?",
 		"answered": false,
@@ -107,6 +111,7 @@
 		"id": "6",
 		"difficulty":"easy",
 		"card": false,
+		"location":"",
 		"answer": "b",
 		"question": "What does IMS stand for?",
 		"answered": false,
@@ -133,6 +138,7 @@
 		"id": "7",
 		"difficulty":"easy",
 		"card": false,
+		"location":"",
 		"answer": "a",
 		"question": "Where is the Centre for Digital and Performance Arts?",
 		"answered": false,
@@ -159,6 +165,7 @@
 		"id": "8",
 		"difficulty":"easy",
 		"card": false,
+		"location":"",
 		"answer": "c",
 		"question": "What is the name of the theatre at CDPA?",
 		"answered": false,
@@ -185,13 +192,14 @@
 		"id": "9",
 		"difficulty":"easy",
 		"card": false,
+		"location":"",
 		"answer": "b",
 		"question": "Which of the following IS NOT one of the student's presentations?",
 		"answered": false,
 		"answers": [
 			{
 				"id": "a",
-				"answer": "Who Want's To Be a Developer?"
+				"answer": "Who Wants To Be a Developer?"
 			},
 			{
 				"id": "b",
@@ -211,6 +219,7 @@
 		"id": "10",
 		"difficulty":"easy",
 		"card": false,
+		"location":"",
 		"answer": "d",
 		"question": "How many floors are there at CDPA?",
 		"answered": false,
@@ -237,6 +246,7 @@
 		"id": "12",
 		"difficulty":"medium",
 		"card": false,
+		"location":"",
 		"answer": "a",
 		"question": "When did the Center for Digital and Performance Arts open its doors?",
 		"answered": false,
@@ -263,6 +273,7 @@
 		"id": "13",
 		"difficulty":"medium",
 		"card": false,
+		"location":"",
 		"answer": "a",
 		"question": "When were the first classes held at Fanshawe?",
 		"answered": false,
@@ -289,17 +300,18 @@
 		"id": "14",
 		"difficulty":"medium",
 		"card": false,
+		"location":"",
 		"answer": "d",
 		"question": "Who is the Supervisor for the Centre of Digital and Performance Arts?",
 		"answered": false,
 		"answers": [
 			{
 				"id": "a",
-				"answer": "30"
+				"answer": "Ryan White"
 			},
 			{
 				"id": "b",
-				"answer": "65"
+				"answer": "Marco Deluca"
 			},
 			{
 				"id": "c",
@@ -315,13 +327,14 @@
 		"id": "15",
 		"difficulty":"medium",
 		"card": false,
+		"location":"",
 		"answer": "c",
 		"question": "Who is Fanshawe's President?",
 		"answered": false,
 		"answers": [
 			{
 				"id": "a",
-				"answer": "5"
+				"answer": "Peter Griffin"
 			},
 			{
 				"id": "b",
@@ -333,7 +346,7 @@
 			},
 			{
 				"id": "d",
-				"answer": "7"
+				"answer": "John Bennett"
 			}
 		]
 	},
@@ -341,6 +354,7 @@
 		"id": "16",
 		"difficulty":"medium",
 		"card": false,
+		"location":"",
 		"answer": "a",
 		"question": "Which of these programs ARE NOT at Centre for Digital and Performance Arts?",
 		"answered": false,
@@ -367,6 +381,7 @@
 		"id": "17",
 		"difficulty":"medium",
 		"card": false,
+		"location":"",
 		"answer": "c",
 		"question": "How many campuses does Fanshawe have?",
 		"answered": false,
@@ -393,6 +408,7 @@
 		"id": "18",
 		"difficulty":"medium",
 		"card": false,
+		"location":"",
 		"answer": "c",
 		"question": "How many programs does Fanshawe offer?",
 		"answered": false,
@@ -419,6 +435,7 @@
 		"id": "19",
 		"difficulty":"medium",
 		"card": false,
+		"location":"",
 		"answer": "a",
 		"question": "Name the Instagram account for The Center for Digital and Performance Arts.",
 		"answered": false,
@@ -445,25 +462,26 @@
 		"id": "20",
 		"difficulty":"medium",
 		"card": false,
+		"location":"",
 		"answer": "b",
 		"question": "Which of the following is Fanshawe's motto?",
 		"answered": false,
 		"answers": [
 			{
 				"id": "a",
-				"answer": "5"
+				"answer": "One step at a time"
 			},
 			{
 				"id": "b",
-				"answer": "Unlocking Potential"
+				"answer": "Unlocking potential"
 			},
 			{
 				"id": "c",
-				"answer": "4"
+				"answer": "Never say never"
 			},
 			{
 				"id": "d",
-				"answer": "7"
+				"answer": "Creating futures"
 			}
 		]
 	},
@@ -471,6 +489,7 @@
 		"id": "21",
 		"difficulty":"hard",
 		"card": false,
+		"location":"",
 		"answer": "c",
 		"question": "How many programs does Fanshawe offer?",
 		"answered": false,
@@ -497,6 +516,7 @@
 		"id": "22",
 		"difficulty":"hard",
 		"card": false,
+		"location":"",
 		"answer": "c",
 		"question": "How many IMS presentations are there?",
 		"answered": false,
@@ -523,6 +543,7 @@
 		"id": "23",
 		"difficulty":"hard",
 		"card": false,
+		"location":"",
 		"answer": "a",
 		"question": "When did Fanshawe re-brand?",
 		"answered": false,
@@ -549,8 +570,9 @@
 		"id": "24",
 		"difficulty":"hard",
 		"card": false,
+		"location":"",
 		"answer": "a",
-		"question": "WHat is the name of Fanshawe's mascot?",
+		"question": "What is the name of Fanshawe's mascot?",
 		"answered": false,
 		"answers": [
 			{
@@ -559,15 +581,15 @@
 			},
 			{
 				"id": "b",
-				"answer": ""
+				"answer": "Fredrick the Falcon"
 			},
 			{
 				"id": "c",
-				"answer": ""
+				"answer": "George the Falcon"
 			},
 			{
 				"id": "d",
-				"answer": ""
+				"answer": "Sherri the Falcon"
 			}
 		]
 	},
@@ -575,6 +597,7 @@
 		"id": "25",
 		"difficulty":"hard",
 		"card": false,
+		"location":"",
 		"answer": "b",
 		"question": "What is the newest addition to Fanshawe's main campus?",
 		"answered": false,
