@@ -191,7 +191,7 @@
 	{
 		"id": "9",
 		"difficulty":"easy",
-		"card": false,
+		"card": true,
 		"location":"",
 		"answer": "b",
 		"question": "Which of the following IS NOT one of the student's presentations?",
@@ -245,7 +245,7 @@
 	{
 		"id": "12",
 		"difficulty":"medium",
-		"card": false,
+		"card": true,
 		"location":"",
 		"answer": "a",
 		"question": "When did the Center for Digital and Performance Arts open its doors?",
@@ -272,7 +272,7 @@
 	{
 		"id": "13",
 		"difficulty":"medium",
-		"card": false,
+		"card": true,
 		"location":"",
 		"answer": "a",
 		"question": "When were the first classes held at Fanshawe?",
@@ -299,7 +299,7 @@
 	{
 		"id": "14",
 		"difficulty":"medium",
-		"card": false,
+		"card": true,
 		"location":"",
 		"answer": "d",
 		"question": "Who is the Supervisor for the Centre of Digital and Performance Arts?",
@@ -326,7 +326,7 @@
 	{
 		"id": "15",
 		"difficulty":"medium",
-		"card": false,
+		"card": true,
 		"location":"",
 		"answer": "c",
 		"question": "Who is Fanshawe's President?",
@@ -353,7 +353,7 @@
 	{
 		"id": "16",
 		"difficulty":"medium",
-		"card": false,
+		"card": true,
 		"location":"",
 		"answer": "a",
 		"question": "Which of these programs ARE NOT at Centre for Digital and Performance Arts?",
@@ -380,7 +380,7 @@
 	{
 		"id": "17",
 		"difficulty":"medium",
-		"card": false,
+		"card": true,
 		"location":"",
 		"answer": "c",
 		"question": "How many campuses does Fanshawe have?",
@@ -407,7 +407,7 @@
 	{
 		"id": "18",
 		"difficulty":"medium",
-		"card": false,
+		"card": true,
 		"location":"",
 		"answer": "c",
 		"question": "How many programs does Fanshawe offer?",
@@ -434,7 +434,7 @@
 	{
 		"id": "19",
 		"difficulty":"medium",
-		"card": false,
+		"card": true,
 		"location":"",
 		"answer": "a",
 		"question": "Name the Instagram account for The Center for Digital and Performance Arts.",
@@ -461,7 +461,7 @@
 	{
 		"id": "20",
 		"difficulty":"medium",
-		"card": false,
+		"card": true,
 		"location":"",
 		"answer": "b",
 		"question": "Which of the following is Fanshawe's motto?",
@@ -542,7 +542,7 @@
 	{
 		"id": "23",
 		"difficulty":"hard",
-		"card": false,
+		"card": true,
 		"location":"",
 		"answer": "a",
 		"question": "When did Fanshawe re-brand?",
