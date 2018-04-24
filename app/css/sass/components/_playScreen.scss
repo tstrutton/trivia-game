@@ -16,6 +16,7 @@
   margin-left: 100px;
   margin-bottom: 40px;
   color: $white;
+  z-index: 20;
   text-align: center;
 
   h2{
@@ -35,8 +36,9 @@
   margin-bottom: 40px;
   margin-right: 100px;
   color: $white;
+  z-index: 20;
   text-align: center;
-  
+
   h2{
     font-size: 2.2em;
     margin-bottom: 10px;

@@ -24,20 +24,26 @@ const TeaserScreen = {
   methods: {
     closeTeaser(){
       this.$router.replace('start');
+    },
+    skipVideo(){
+      var vm = this;
+      vm.$destroy();
+      router.replace('quiz');
     }
   },
   mounted(){
-    window.addEventListener('keyup', function() {
-        router.replace('start');
-    });
+    var vm = this;
+
   },
   template: `
   <div id="teaser-screen" @click="closeTeaser">
   <div id="video-container">
     <div id="skip-video">
-      <h2>Press any key to start game.</h2>
+      <button @click="skipVideo" class="button">Start Game</button>
     </div>
     <video id="promoVideo" src="videos/promo.mp4" autoplay loop></video>
+    <div>
+    </div>
   </div>
   </div>`
 }
@@ -98,19 +104,26 @@ const StartScreen = {
 const Tutorial = {
   name: 'Tutorial',
   mounted(){
+    var vm = this;
     var teaserVideo = this.$el.querySelector('#teaserVideo');
     teaserVideo.onended = function() {
+        vm.$destroy();
         router.replace('quiz');
     };
-    window.addEventListener('keyup', function() {
-        router.replace('quiz');
-    });
+  },
+  methods:{
+    skipVideo(){
+      var vm = this;
+      vm.$destroy();
+      router.replace('quiz');
+    }
+
   },
   template: `
   <div id="tutorial-screen">
     <div id="video-container">
       <div id="skip-video">
-        <h2>Press any key to skip video.</h2>
+        <button class="button" @click="skipVideo">Skip Rules</button>
       </div>
       <video id="teaserVideo" src="videos/rules.mp4" autoplay></video>
     </div>
@@ -362,11 +375,15 @@ const PlayScreen = {
     },
     countdown1(){
       var vm = this;
-      if(vm.player1Time != 0){
-        vm.player1Time -= 1;
-      }else{
-        vm.disqualifyPlayer(1);
+      if (!vm.disqualify) {
+        console.log("Check");
+        if(vm.player1Time != 0){
+          vm.player1Time -= 1;
+        }else{
+          vm.disqualifyPlayer(1);
+        }
       }
+
     },
     countdown2(){
       var vm = this;
@@ -378,15 +395,21 @@ const PlayScreen = {
     },
     disqualifyPlayer(player){
       var vm = this;
+      vm.stopTimer();
       //console.log("Disaqualify Player - "+player);
-      this.$parent.$emit('Winner', player);
       this.disqualify = true;
+      this.showVideo = true;
+      this.$parent.$emit('Winner', player);
+      window.clearInterval(sensorObj1);
+      window.clearInterval(sensorObj2);
+      clearInterval(gameTime);
 
       if (player === 1) {
         window.clearInterval(sensorObj1);
       }else if(player === 2){
         window.clearInterval(sensorObj2);
       }
+
       var disqualifyVideo = this.$el.querySelector('#disqualifyVideo');
       disqualifyVideo.play();
       this.showQuestion = false;
@@ -396,7 +419,10 @@ const PlayScreen = {
       disqualifyVideo.onended = function() {
           vm.showVideo = false;
           vm.disqualify = false;
-          vm.$emit.winner;
+          vm.sensor2 === false;
+          vm.sensor1 === false;
+          window.clearInterval(sensorObj1);
+          window.clearInterval(sensorObj2);
           vm.$destroy();
           vm.$router.replace('disqualify');
       };
@@ -536,7 +562,6 @@ const PlayScreen = {
             vm.showVideo = false;
             vm.correct = false;
             vm.showAnswer();
-            //vm.switchQuestion();
         };
 
       }else if (answer === "incorrect") {
@@ -561,7 +586,6 @@ const PlayScreen = {
         incorrectVideo.onended = function() {
             vm.showVideo = false;
             vm.incorrect = false;
-            //vm.switchQuestion();
             vm.showAnswer();
         };
       }else if(answer === "time"){
@@ -578,7 +602,6 @@ const PlayScreen = {
             vm.showVideo = false;
             vm.timesUp = false;
             vm.showAnswer();
-            //vm.switchQuestion();
         };
       }else if(answer === "winner"){
         this.winner = true;
@@ -591,7 +614,7 @@ const PlayScreen = {
         winnerVideo.onended = function() {
             vm.showVideo = false;
             vm.timesUp = false;
-            vm.$emit.winner
+            vm.$emit.winner;
             vm.$destroy();
             vm.$router.replace('gameOver');
         };
@@ -621,6 +644,7 @@ const PlayScreen = {
       timerObj = null;
     },
     timerTick(){
+      //console.log("Ticking");
       var vm = this;
 
       function removeWrong(){
@@ -682,7 +706,7 @@ const PlayScreen = {
             <video id="winnerVideo" src="videos/winner.mp4" v-show="winner"></video>
           </transition>
           <transition name="fade">
-            <video id="disqualifyVideo" src="videos/winner.mp4" v-show="disqualify"></video>
+            <video id="disqualifyVideo" src="videos/disq.mp4" v-show="disqualify"></video>
           </transition>
       </div>
     </transition>
@@ -713,6 +737,7 @@ const PlayScreen = {
     <div id="question-container" v-show="showQuestion">
         <div id="question" >
           <h2>{{currentQuestion.question}}</h2>
+          <h3>{{currentQuestion.location}}</h3>
         </div>
 
 
@@ -777,6 +802,10 @@ const GameOver = {
       gametime: '',
     }
   },
+  created(){
+    window.clearInterval(sensorObj1);
+    window.clearInterval(sensorObj2);
+  },
   methods: {
     saveScore(){
       var name = this.winnerName;
@@ -813,9 +842,9 @@ const GameOver = {
   </div>`
 }
 
-const GameOver = {
+const DisaqualifyScreen = {
   props: ['playerone','playertwo','winner','gametime'],
-  name: 'GameOver',
+  name: 'DisaqualifyScreen',
   data(){
     return{
       winnerName: '',
@@ -829,12 +858,13 @@ const GameOver = {
 
   },
   created(){
-    //console.log(this.winner);
+    window.clearInterval(sensorObj1);
+    window.clearInterval(sensorObj2);
     this.$parent.$emit('ResetScore');
     var winner = this.winner;
-    if (winner=== "1") {
+    if (winner=== 1) {
       this.winnerName = this.playerone;
-    }else if(winner === "2"){
+    }else if(winner === 2){
       this.winnerName = this.playertwo;
     }
   },
@@ -881,6 +911,11 @@ const routes = [
       path: '/gameOver',
       name: 'GameOver',
       component: GameOver
+    },
+    {
+      path: '/disqualify',
+      name: 'Disqualify',
+      component: DisaqualifyScreen
     }
 ]
 
