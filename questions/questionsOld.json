@@ -1,4 +1,4 @@
-[
+/* [
 	{
 		"id": "1",
 		"difficulty":"easy",
@@ -185,7 +185,7 @@
 		"id": "9",
 		"difficulty":"easy",
 		"card": false,
-		"answer": "d",
+		"answer": "b",
 		"question": "Which of the following IS NOT one of the student's presentations?",
 		"answered": false,
 		"answers": [
@@ -295,15 +295,15 @@
 		"answers": [
 			{
 				"id": "a",
-				"answer": "Ryan White"
+				"answer": "30"
 			},
 			{
 				"id": "b",
-				"answer": "Marco Deluca"
+				"answer": "65"
 			},
 			{
 				"id": "c",
-				"answer": "Robert Haaf"
+				"answer": "Rob Haaf"
 			},
 			{
 				"id": "d",
@@ -321,7 +321,7 @@
 		"answers": [
 			{
 				"id": "a",
-				"answer": "Peter Griffin"
+				"answer": "5"
 			},
 			{
 				"id": "b",
@@ -333,7 +333,7 @@
 			},
 			{
 				"id": "d",
-				"answer": "John Bennett"
+				"answer": "7"
 			}
 		]
 	},
@@ -559,15 +559,15 @@
 			},
 			{
 				"id": "b",
-				"answer": "Fredrick the falcon"
+				"answer": ""
 			},
 			{
 				"id": "c",
-				"answer": "George the falcon"
+				"answer": ""
 			},
 			{
 				"id": "d",
-				"answer": "Sherri the falcon"
+				"answer": ""
 			}
 		]
 	},
@@ -596,31 +596,5 @@
 				"answer": "Oasis"
 			}
 		]
-	},
-	{
-			"id": "26",
-			"difficulty":"hard",
-			"card": false,
-			"answer": "d",
-			"question": "How many student Generative Art pieces are there on display?",
-			"answered": false,
-			"answers": [
-				{
-					"id": "a",
-					"answer": "5"
-				},
-				{
-					"id": "b",
-					"answer": "8"
-				},
-				{
-					"id": "c",
-					"answer": "10"
-				},
-				{
-					"id": "d",
-					"answer": "9"
-				}
-			]
-		}
-]
+	}
+] */

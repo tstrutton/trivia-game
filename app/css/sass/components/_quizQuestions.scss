@@ -48,7 +48,7 @@
 }
 
 #answer-b{
-  background: transparentize($red,.2);
+  background: transparentize($green,.2);
   transition: opacity 1s;
 }
 
@@ -58,6 +58,6 @@
 }
 
 #answer-d{
-  background: transparentize($green,.2);
+  background: transparentize($blue,.2);
   transition: opacity 1s;
 }

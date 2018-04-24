@@ -26,9 +26,17 @@ const TeaserScreen = {
       this.$router.replace('start');
     }
   },
+  mounted(){
+    window.addEventListener('keyup', function() {
+        router.replace('start');
+    });
+  },
   template: `
   <div id="teaser-screen" @click="closeTeaser">
   <div id="video-container">
+    <div id="skip-video">
+      <h2>Press any key to start game.</h2>
+    </div>
     <video id="promoVideo" src="videos/promo.mp4" autoplay loop></video>
   </div>
   </div>`
@@ -68,16 +76,17 @@ const StartScreen = {
   template: `
   <div id="start-screen">
     <div id="name-form">
-    <h2 id="name-prompt">Enter Your Names Below To Play</h2>
-    <div :class="{'active': warningActive}" class="warning-box">
-      <h2>Please Enter A Name For Each Player</h2>
-    </div>
-    <div class="form-group">
-      <label>Player 1:</label>
-      <input type="text" name="playerone" v-model="playerone">
-    </div><div class="form-group">
-      <label>Player 2:</label>
-      <input type="text" name="playertwo" v-model="playertwo">
+      <h2 id="name-prompt">Enter Your Names Below To Play</h2>
+      <h4 id="prize-prompt">*Enter your name as shown on your ID in order to claim prize*</h4>
+      <div :class="{'active': warningActive}" class="warning-box">
+        <h2>Please Enter A Name For Each Player</h2>
+      </div>
+      <div class="form-group">
+        <label>Player 1:</label>
+        <input type="text" name="playerone" v-model="playerone" placeholder="full name">
+      </div><div class="form-group">
+        <label>Player 2:</label>
+        <input type="text" name="playertwo" v-model="playertwo" placeholder="full name">
     </div>
 
     <button class="button" id="name-button" @click="startGame(playerone,playertwo)">Start</button>
@@ -93,10 +102,16 @@ const Tutorial = {
     teaserVideo.onended = function() {
         router.replace('quiz');
     };
+    window.addEventListener('keyup', function() {
+        router.replace('quiz');
+    });
   },
   template: `
   <div id="tutorial-screen">
     <div id="video-container">
+      <div id="skip-video">
+        <h2>Press any key to skip video.</h2>
+      </div>
       <video id="teaserVideo" src="videos/rules.mp4" autoplay></video>
     </div>
   </div>`
@@ -132,11 +147,9 @@ const Leaderboard = {
     }
 
     leaderboard.sort((a, b) => a.score - b.score);
-    //console.log(leaderboard);
 
     //Sort Leaderboard by lowest score at top (shortest time)
     for (var i = 0; i < leaderboard.length; i++) {
-      //leaderboard[i]
       var data = leaderboard[i];
       tr[i] = document.createElement('tr');
       var td1 = document.createElement('td');
@@ -190,12 +203,17 @@ const PlayScreen = {
       incorrect: false,
       timesUp: false,
       winner: false,
+      disqualify: false,
       showAnswers: false,
       showQuestion: false,
       showCorrectAnswer: false,
       showTimer: false,
       guessed: [],
       play: false,
+      player1Time: 0,
+      player2Time: 0,
+      sensor1: false,
+      sensor2: false,
     }
   },
   created(){
@@ -225,59 +243,6 @@ const PlayScreen = {
         }
 
       })
-
-      // new five.Boards([ "A", "B" ]).on("ready", function() {
-      //
-      //   //Player One Buttons
-      //   var p1b1 = new five.Button({ pin: 8, board: this[0] });
-      //   var p1b2 = new five.Button({ pin: 7, board: this[0] });
-      //   var p1b3 = new five.Button({ pin: 4, board: this[0] });
-      //   var p1b4 = new five.Button({ pin: 2, board: this[0] });
-      //
-      //   p1b1.on("press", function(){
-      //     //console.log("Player 1 Button 1");
-      //     vm.questionGuess('a','1');
-      //   });
-      //   p1b2.on("press", function(){
-      //     //console.log("Player 1 Button 2");
-      //     vm.questionGuess('b','1');
-      //   });
-      //   p1b3.on("press", function(){
-      //     //console.log("Player 1 Button 3");
-      //     vm.questionGuess('c','1');
-      //   });
-      //   p1b4.on("press", function(){
-      //     //console.log("Player 1 Button 4");
-      //     vm.questionGuess('d','1');
-      //   });
-      //
-      //   //Player Two Buttons
-      //   var p2b1 = new five.Button({ pin: 8, board: this[1] });
-      //   var p2b2 = new five.Button({ pin: 7, board: this[1] });
-      //   var p2b3 = new five.Button({ pin: 4, board: this[1] });
-      //   var p2b4 = new five.Button({ pin: 2, board: this[1] });
-      //
-      //   p2b1.on("press", function(){
-      //     console.log("Player 2 button 1");
-      //     vm.questionGuess('a','2');
-      //   });
-      //   //
-      //   p2b2.on("press", function(){
-      //     console.log("Player 2 button 2");
-      //     vm.questionGuess('b','2');
-      //   });
-      //   p2b3.on("press", function(){
-      //     console.log("Player 2 button 3");
-      //     vm.questionGuess('c','2');
-      //   });
-      //   p2b4.on("press", function(){
-      //     console.log("Player 2 button 4");
-      //     vm.questionGuess('d','2');
-      //   });
-      //
-      // });
-
-
   vm.loadQuestions();
 
   },
@@ -289,11 +254,13 @@ const PlayScreen = {
       var p1b2 = new five.Button({ pin: 7, board: this.board[0] });
       var p1b3 = new five.Button({ pin: 4, board: this.board[0] });
       var p1b4 = new five.Button({ pin: 2, board: this.board[0] });
+      var sensor1 = new five.Sensor({ pin: "A0", board: this.board[0] });
       //Player two buttons
       var p2b1 = new five.Button({ pin: 8, board: this.board[1] });
       var p2b2 = new five.Button({ pin: 7, board: this.board[1] });
       var p2b3 = new five.Button({ pin: 4, board: this.board[1] });
       var p2b4 = new five.Button({ pin: 2, board: this.board[1] });
+      var sensor2 = new five.Sensor({ pin: "A0", board: this.board[1] });
 
       p1b1.on("press", function(){
         //console.log("Player 1 Button 1");
@@ -313,27 +280,128 @@ const PlayScreen = {
       });
 
       p2b1.on("press", function(){
-        console.log("Player 2 button 1");
+        //console.log("Player 2 button 1");
         vm.questionGuess('a','2');
       });
       //
       p2b2.on("press", function(){
-        console.log("Player 2 button 2");
+        //console.log("Player 2 button 2");
         vm.questionGuess('b','2');
       });
       p2b3.on("press", function(){
-        console.log("Player 2 button 3");
+        //console.log("Player 2 button 3");
         vm.questionGuess('c','2');
       });
       p2b4.on("press", function(){
-        console.log("Player 2 button 4");
+        //console.log("Player 2 button 4");
         vm.questionGuess('d','2');
+      });
+
+      //Sensor Functions
+      //To remove sensors comment this out and change sensor1/2 in data to false
+      sensor1.on("change", function(){
+        if(this.value <= 200) {
+          //console.log(this.value);
+          vm.sensor1 = true;
+        }else{
+          vm.sensor1 = false;
+        }
+      });
+
+
+      sensor2.on("change", function(){
+        //console.log(this.value);
+        if(this.value <= 700) {
+          vm.sensor2 = true;
+        }else{
+          vm.sensor2 = false;
+        }
       });
 
 
 
   },
+  watch: {
+    sensor1: function () {
+      if (this.sensor1 === true) {
+        this.warnPlayer(1);
+      }else{
+        this.stopCountdown(1);
+      }
+    },
+    sensor2: function(){
+      if (this.sensor2 === true) {
+        this.warnPlayer(2);
+      }else{
+        this.stopCountdown(2);
+      }
+    }
+  },
   methods: {
+    warnPlayer(player){
+      console.log("Warn player - "+player);
+
+      if (player === 1) {
+        this.player1Time = 5;
+        sensorObj1 = window.setInterval(this.countdown1, 1000);
+      }else if(player === 2){
+        this.player2Time = 5;
+        sensorObj2 = window.setInterval(this.countdown2, 1000);
+      }
+
+    },
+    stopCountdown(player){
+      if (player === 1) {
+        console.log("Stop 1");
+        window.clearInterval(sensorObj1);
+      }else if(player === 2){
+        console.log("Stop 2");
+        window.clearInterval(sensorObj2);
+      }
+
+    },
+    countdown1(){
+      var vm = this;
+      if(vm.player1Time != 0){
+        vm.player1Time -= 1;
+      }else{
+        vm.disqualifyPlayer(1);
+      }
+    },
+    countdown2(){
+      var vm = this;
+      if(vm.player2Time != 0){
+        vm.player2Time -= 1;
+      }else{
+        vm.disqualifyPlayer(2);
+      }
+    },
+    disqualifyPlayer(player){
+      var vm = this;
+      //console.log("Disaqualify Player - "+player);
+      this.$parent.$emit('Winner', player);
+      this.disqualify = true;
+
+      if (player === 1) {
+        window.clearInterval(sensorObj1);
+      }else if(player === 2){
+        window.clearInterval(sensorObj2);
+      }
+      var disqualifyVideo = this.$el.querySelector('#disqualifyVideo');
+      disqualifyVideo.play();
+      this.showQuestion = false;
+      this.showAnswers = false;
+      this.showTimer = false;
+
+      disqualifyVideo.onended = function() {
+          vm.showVideo = false;
+          vm.disqualify = false;
+          vm.$emit.winner;
+          vm.$destroy();
+          vm.$router.replace('disqualify');
+      };
+
+    },
     showAnswer(){
       var vm = this;
       this.showCorrectAnswer = true;
@@ -398,10 +466,11 @@ const PlayScreen = {
               vm.incorrectFunction(player);
             }
           }else{
+            console.log("Can't answer right now");
           }
-
         }
       }else{
+        console.log("Can't answer right now");
       }
     },
     correctFunction(player){
@@ -612,6 +681,9 @@ const PlayScreen = {
           <transition name="fade">
             <video id="winnerVideo" src="videos/winner.mp4" v-show="winner"></video>
           </transition>
+          <transition name="fade">
+            <video id="disqualifyVideo" src="videos/winner.mp4" v-show="disqualify"></video>
+          </transition>
       </div>
     </transition>
 
@@ -681,6 +753,18 @@ const PlayScreen = {
       <button id="2c" @click="questionGuess('c','2')">C</button>
       <button id="2d" @click="questionGuess('d','2')">D</button>
     </div>
+
+    <!-- Sensor Warnings -->
+      <div id="sensor-one" v-show="sensor1">
+        <h2>{{player1Time}}</h2>
+        <h3>Step Back On the Sensor</h3>
+      </div>
+
+      <div id="sensor-two" v-show="sensor2">
+        <h2>{{player2Time}}</h2>
+        <h3>Step Back On the Sensor</h3>
+      </div>
+    <!-- Sensor Warnings End -->
   </div>`
 }
 
@@ -724,6 +808,44 @@ const GameOver = {
       <h3 id="winner-name">Winner: {{winnerName}}</h3>
       <h3 id="winner-score">Winning Time: {{gametime}} seconds</h3>
       <button class="button" @click="saveScore">Submit Your Score!</button>
+    </div>
+
+  </div>`
+}
+
+const GameOver = {
+  props: ['playerone','playertwo','winner','gametime'],
+  name: 'GameOver',
+  data(){
+    return{
+      winnerName: '',
+      gametime: '',
+    }
+  },
+  methods: {
+    restartGame(){
+      this.$router.replace('leaderboard');
+    }
+
+  },
+  created(){
+    //console.log(this.winner);
+    this.$parent.$emit('ResetScore');
+    var winner = this.winner;
+    if (winner=== "1") {
+      this.winnerName = this.playerone;
+    }else if(winner === "2"){
+      this.winnerName = this.playertwo;
+    }
+  },
+
+  template: `
+  <div id="game-over">
+    <div id="game-over-inner">
+      <h2>Game Over</h2>
+      <h3 id="winner-name">Winner: {{winnerName}}</h3>
+      <h3 id="winner-score">Only full game scores can be submitted to the leaderboard.</h3>
+      <button class="button" @click="restartGame">Play Again!</button>
     </div>
 
   </div>`
