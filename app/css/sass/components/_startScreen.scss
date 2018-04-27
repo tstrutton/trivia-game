@@ -82,6 +82,23 @@
   		opacity: 0.75;
   	}
   }
+  #promo-button{
+    background: none;
+    margin: 20px auto 0 auto;
+  	display: block;
+  	background: none;
+  	color: $white;
+  	border-radius: 10px;
+  	font-size: 1.25em;
+  	padding: 15px 40px;
+  	transition: 0.4s;
+    font-size: 1em;
+    font-family: $gothamBook;
+
+    &:hover{
+  		opacity: 0.75;
+  	}
+  }
 }
 
 .warning-box{

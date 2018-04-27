@@ -68,6 +68,10 @@ const StartScreen = {
         this.gameTimer();
       }
     },
+    playPromo(){
+      this.$router.replace('TeaserScreen');
+
+    },
     gameTimer(){
       gameTime = window.setInterval(this.gameClock, 1000);
     },
@@ -97,6 +101,7 @@ const StartScreen = {
 
     <button class="button" id="name-button" @click="startGame(playerone,playertwo)">Start</button>
     <button class="button" id="leaderboard-button" @click="showLeaderBoard">View Leaderboard</button>
+    <button class="button" id="promo-button" @click="playPromo">Play Promo</button>
     </div>
   </div>`
 }
@@ -187,6 +192,7 @@ const Leaderboard = {
     <div>
       <button class="button" id="back-button" @click="backToStart">Back</button>
       <h2 id="leaderboard-title">Leaderboard</h2>
+      <h3 class="center-white">Meet at the front of the building at 8am to claim your prize!</h3>
       <table id="leaderboard">
         <tr id="table-head">
           <th>Name</th>
@@ -216,6 +222,7 @@ const PlayScreen = {
       incorrect: false,
       timesUp: false,
       winner: false,
+      location: false,
       disqualify: false,
       showAnswers: false,
       showQuestion: false,
@@ -244,12 +251,15 @@ const PlayScreen = {
 
         //Load the correct answer to show players
         var answers = vm.currentQuestion.answers;
+
+        vm.location = vm.currentQuestion.card;
+
         for (var i = 0; i < answers.length; i++) {
           var answerId = answers[i].id;
           if (answerId === vm.currentQuestion.answer) {
             vm.correctAnswer = answers[i].answer;
             vm.correctId = answerId;
-            console.log(vm.correctId+" - "+vm.correctAnswer);
+            //console.log(vm.correctId+" - "+vm.correctAnswer);
           }else{
             vm.incorrectId.push(answerId);
           }
@@ -260,7 +270,7 @@ const PlayScreen = {
 
   },
   mounted(){
-    var vm = this;
+      var vm = this;
 
       //Player one buttons
       var p1b1 = new five.Button({ pin: 8, board: this.board[0] });
@@ -376,7 +386,7 @@ const PlayScreen = {
     countdown1(){
       var vm = this;
       if (!vm.disqualify) {
-        console.log("Check");
+        //console.log("Check");
         if(vm.player1Time != 0){
           vm.player1Time -= 1;
         }else{
@@ -396,7 +406,6 @@ const PlayScreen = {
     disqualifyPlayer(player){
       var vm = this;
       vm.stopTimer();
-      //console.log("Disaqualify Player - "+player);
       this.disqualify = true;
       this.showVideo = true;
       this.$parent.$emit('Winner', player);
@@ -404,9 +413,9 @@ const PlayScreen = {
       window.clearInterval(sensorObj2);
       clearInterval(gameTime);
 
-      if (player === 1) {
+      if (player == 1) {
         window.clearInterval(sensorObj1);
-      }else if(player === 2){
+      }else if(player == 2){
         window.clearInterval(sensorObj2);
       }
 
@@ -423,8 +432,47 @@ const PlayScreen = {
           vm.sensor1 === false;
           window.clearInterval(sensorObj1);
           window.clearInterval(sensorObj2);
+          vm.$emit.winner;
+          if (player == 1) {
+            var winner = 2;
+          }else if(player == 2){
+            var winner = 1;
+          }
+
+          vm.$parent.$emit('DisqualifyPoints', winner);
           vm.$destroy();
           vm.$router.replace('disqualify');
+      };
+
+    },
+    noQuestions(){
+      var vm = this;
+      vm.stopTimer();
+      this.disqualify = true;
+      this.showVideo = true;
+      this.$parent.$emit('Winner', 1);
+      window.clearInterval(sensorObj1);
+      window.clearInterval(sensorObj2);
+      clearInterval(gameTime);
+
+      var disqualifyVideo = this.$el.querySelector('#disqualifyVideo');
+      disqualifyVideo.play();
+      this.showQuestion = false;
+      this.showAnswers = false;
+      this.showTimer = false;
+
+      disqualifyVideo.onended = function() {
+          vm.showVideo = false;
+          vm.disqualify = false;
+          vm.sensor2 === false;
+          vm.sensor1 === false;
+          window.clearInterval(sensorObj1);
+          window.clearInterval(sensorObj2);
+          vm.$emit.winner;
+
+          vm.$parent.$emit('DisqualifyPoints', 1);
+          vm.$destroy();
+          vm.$router.replace('noquestions');
       };
 
     },
@@ -433,7 +481,6 @@ const PlayScreen = {
       this.showCorrectAnswer = true;
       setTimeout(() => vm.showCorrectAnswer = false, 4000);
       setTimeout(() => vm.switchQuestion() , 5000);
-
     },
     switchQuestion(currentId){
       var vm = this;
@@ -445,21 +492,23 @@ const PlayScreen = {
       vm.incorrectId = [];
 
       //Load the correct answer to show players
-      var answers = vm.currentQuestion.answers;
-      for (var i = 0; i < answers.length; i++) {
-        var answerId = answers[i].id;
-        if (answerId === vm.currentQuestion.answer) {
-          vm.correctAnswer = answers[i].answer;
-          vm.correctId = answerId;
-          console.log(vm.correctId+" - "+vm.correctAnswer);
-        }else{
-          vm.incorrectId.push(answerId);
+        var answers = vm.currentQuestion.answers;
+        for (var i = 0; i < answers.length; i++) {
+          var answerId = answers[i].id;
+          if (answerId === vm.currentQuestion.answer) {
+            vm.correctAnswer = answers[i].answer;
+            vm.correctId = answerId;
+            console.log(vm.correctId+" - "+vm.correctAnswer);
+          }else{
+            vm.incorrectId.push(answerId);
+          }
         }
-      }
-      this.loadQuestions();
+        this.loadQuestions();
+
     },
     loadQuestions(){
       var vm = this;
+      vm.location = vm.currentQuestion.card;
       //Give time to load question, then answers, then start the timer
       setTimeout(() => vm.showQuestion = true, 1000);
       setTimeout(() => vm.showAnswers = true, 4000);
@@ -737,7 +786,7 @@ const PlayScreen = {
     <div id="question-container" v-show="showQuestion">
         <div id="question" >
           <h2>{{currentQuestion.question}}</h2>
-          <h3>{{currentQuestion.location}}</h3>
+          <h3 id="location" v-if="location">Card Location - {{currentQuestion.location}}</h3>
         </div>
 
 
@@ -842,9 +891,42 @@ const GameOver = {
   </div>`
 }
 
-const DisaqualifyScreen = {
+const NoQuestions = {
   props: ['playerone','playertwo','winner','gametime'],
-  name: 'DisaqualifyScreen',
+  name: 'NoQuestions',
+  data(){
+    return{
+      winnerName: '',
+      gametime: '',
+    }
+  },
+  methods: {
+    restartGame(){
+      this.$router.replace('leaderboard');
+    }
+
+  },
+  created(){
+    window.clearInterval(sensorObj1);
+    window.clearInterval(sensorObj2);
+    this.$parent.$emit('ResetScore');
+  },
+
+  template: `
+  <div id="game-over">
+    <div id="game-over-inner">
+      <h2>Game Over</h2>
+      <h3 id="winner-name">No More Questions</h3>
+      <h3 id="winner-score">Try playing again to be able to submit your score.</h3>
+      <button class="button" @click="restartGame">Play Again!</button>
+    </div>
+
+  </div>`
+}
+
+const DisqualifyScreen = {
+  props: ['playerone','playertwo','winner','gametime'],
+  name: 'DisqualifyScreen',
   data(){
     return{
       winnerName: '',
@@ -915,7 +997,12 @@ const routes = [
     {
       path: '/disqualify',
       name: 'Disqualify',
-      component: DisaqualifyScreen
+      component: DisqualifyScreen
+    },
+    {
+      path: '/noquestions',
+      name: 'NoQuestions',
+      component: NoQuestions
     }
 ]
 
@@ -940,12 +1027,20 @@ new Vue({
   },
   created() {
     //Reset Leaderboard
-    // localStorage.clear();
+    //localStorage.clear();
     // console.log(localStorage);
 
     this.$on('DefinePlayers',  (playerone, playertwo) => {
       this.playerone = playerone;
       this.playertwo = playertwo;
+    });
+    this.$on('DisqualifyPoints',  player => {
+      this.winner = player;
+      if(player == 1) {
+        this.playeronepoints == 5;
+      }else if(player == 2){
+        this.playertwopoints == 5;
+      }
     });
     this.$on('GameTime',  gametime => {
       this.gametime = gametime;
@@ -975,23 +1070,9 @@ new Vue({
     });
 
     this.board = new five.Boards([ "A", "B" ]);
-    console.log(this.board);
+    //console.log(this.board);
 
-    // new five.Boards([ "A", "B" ]).on("ready", function() {
-    //   //console.log("Board Ready");
-    //   // var p1b1 = new five.Button({ pin: 8, board: this[0] });
-    //   // var p1b2 = new five.Button({ pin: 7, board: this[0] });
-    //   // var p1b3 = new five.Button({ pin: 4, board: this[0] });
-    //   // var p1b4 = new five.Button({ pin: 2, board: this[0] });
-    //   //
-    //   //
-    //   // //Player Two Buttons
-    //   // var p2b1 = new five.Button({ pin: 8, board: this[1] });
-    //   // var p2b2 = new five.Button({ pin: 7, board: this[1] });
-    //   // var p2b3 = new five.Button({ pin: 4, board: this[1] });
-    //   // var p2b4 = new five.Button({ pin: 2, board: this[1] });
-    //
-    // });
+
 
   },
 })

@@ -8,7 +8,17 @@
   background-position: center;
 }
 
+#location{
+  color: $white;
+  text-align: center;
+  font-size: 1.1em;
+}
 
+.center-white{
+  text-align: center;
+  color: $white;
+  margin: 0 0 20px 0;
+}
 #sensor-one{
   position: absolute;
   left: 0;
